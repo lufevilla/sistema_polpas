@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 
 clearscreen = "2.0.1"
+rusqlite = "0.31" 
