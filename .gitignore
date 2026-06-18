@@ -1,12 +1,1 @@
-# Compilação do Rust
 /target
-
-# Arquivos de variáveis de ambiente 
-.env
-.env*.local
-
-# ignora o arquivo do banco de dados local
-*.db
-*.db-journal
-*.sqlite
-*.sqlite3

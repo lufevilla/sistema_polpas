@@ -1,20 +1,19 @@
-use rusqlite::Connection;
-
 use crate::models::cliente::Cliente;
-use crate::models::pedido::Pedido;
-
-
 use crate::tela::operacoes_basicas::*;
-use crate::tela::servico_cliente::*;
-use crate::tela::crud_pedidos::*;
+use crate::tela::servico_cliente::{alterar_cliente, excluir_cliente, incluir_cliente, listar_clientes};
+// tava dando erro ao usar o mod padrão 
+// por isso usei o super 
+// o super "sobe um nivel" e vai para tela e procura a partir dali o arquivo ler.rs 
 
+use crate::models::pedido::Pedido;
+use crate::tela::crud_pedidos::*;
 
 
 
 use super::operacoes_basicas::limpar;
 
 
-pub fn mostrar_menu(vec_clientes: &mut Vec<Cliente>,vec_pedidos: &mut Vec<Pedido>,conn_db: &Connection) {
+pub fn mostrar_menu(vec_clientes: &mut Vec<Cliente>, vec_pedidos: &mut Vec<Pedido>) {
     loop {
         limpar();
         println!("\
@@ -32,14 +31,12 @@ pub fn mostrar_menu(vec_clientes: &mut Vec<Cliente>,vec_pedidos: &mut Vec<Pedido
         limpar();
 
         match opcao{
-            1 => crud_cliente(vec_clientes,conn_db),
-            2 => crud_pedidos_menu(vec_pedidos,vec_clientes, conn_db),
+            1 => crud_cliente(vec_clientes),
+            2 => crud_pedidos_menu(vec_pedidos, vec_clientes),
             3 => println!("3"),
             4 => println!("4"),
             0 => {  
-                    println!("Finalizando o programa..."); 
-                    pausar(2);
-                    limpar();
+                    println!("voltando para o menu anterior"); 
                     return;
                 },
             _ => println!("opcao invalida")
@@ -51,7 +48,7 @@ pub fn mostrar_menu(vec_clientes: &mut Vec<Cliente>,vec_pedidos: &mut Vec<Pedido
 
 }
 
-fn crud_cliente(vec_clientes: &mut Vec<Cliente>, conn_db: &Connection){
+fn crud_cliente(vec_clientes: &mut Vec<Cliente>){
 
     loop {
         limpar();
@@ -70,10 +67,10 @@ fn crud_cliente(vec_clientes: &mut Vec<Cliente>, conn_db: &Connection){
         limpar();
 
         match opcao{
-            1 => incluir_cliente(conn_db),
-            2 => alterar_cliente(conn_db),
-            3 => listar_clientes(conn_db),
-            4 => excluir_cliente(conn_db),
+            1 => incluir_cliente(vec_clientes),
+            2 => alterar_cliente(vec_clientes),
+            3 => listar_clientes(vec_clientes),
+            4 => excluir_cliente(vec_clientes),
             0 => {  
                     println!("voltando para o menu anterior"); 
                     return;
@@ -87,11 +84,10 @@ fn crud_cliente(vec_clientes: &mut Vec<Cliente>, conn_db: &Connection){
 
 }
 
-fn crud_pedidos_menu(vec_pedidos: &mut Vec<Pedido>, vec_clientes: &mut Vec<Cliente>, conn_db: &Connection) {
+fn crud_pedidos_menu(vec_pedidos: &mut Vec<Pedido>,vec_clientes: &Vec<Cliente>) {
 
       
     loop{
-        limpar();
         println!("\
             ********** MENU **********\n\
             Escolha uma das opções abaixo:\n\
@@ -107,9 +103,9 @@ fn crud_pedidos_menu(vec_pedidos: &mut Vec<Pedido>, vec_clientes: &mut Vec<Clien
         limpar();
 
         match opcao{
-            1 => novo_pedido(vec_pedidos, vec_clientes, conn_db),
+            1 => novo_pedido(vec_pedidos,vec_clientes),
             2 => println!("2"),
-            3 => listar_pedidos(vec_pedidos, conn_db),
+            3 => println!("3"),
             4 => println!("4"),
             0 => {  
                     println!("Voltando para o menu anterior"); 
