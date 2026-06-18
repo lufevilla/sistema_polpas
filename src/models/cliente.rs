@@ -1,4 +1,6 @@
-#[derive(Default, Debug )]
+// Substitua TODO o conteúdo de src/models/cliente.rs por isso:
+
+#[derive(Default)]
 pub struct Endereco {
 
     pub cep: String,
@@ -11,15 +13,14 @@ pub struct Endereco {
 
 }
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct Cliente {
     pub id: usize,
     pub nome: String,
     pub cadastro: String,
     pub endereco: Endereco,
-    pub telefone: String,
+    //pub telefone: String,
     //pub email: String,
-    // Depois eu adiciono eles no crud de clientes 
 
 }
 
