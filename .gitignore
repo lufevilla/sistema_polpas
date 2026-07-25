@@ -1,1 +1,9 @@
+# Compilação do Rust
 /target
+.vscode/
+
+
+# ignora o arquivo do banco de dados local
+*.db
+*.db-journal
+
