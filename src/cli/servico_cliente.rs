@@ -1,113 +1,124 @@
+//esse arquivo possui o seviço de CRUD para os clientes 
+use rusqlite::{Connection};
+
 use crate::models::cliente::Cliente;
-use crate::tela::operacoes_basicas::*;//crates vai pela origem
+use crate::banco_de_dados::database_cl::*;
+use crate::cli::operacoes_basicas::*;//crates vai pela origem
 
-
-
-
-pub fn incluir_cliente (vec_clientes: &mut Vec<Cliente>){
+pub fn incluir_cliente (conn_db: &Connection){
     loop{
 
         limpar();
 
         let mut cliente: Cliente = Cliente::default();
-
-        cliente.id = vec_clientes.len() + 1; // a cada novo cliente cadastrado ele soma 1 ao id 
+        //cliente.id = vec_clientes.len() + 1; // não peciso mais disso pois o sqlite cuida da classificação do ID automaticamente para cada cliente  
         println!("Digite o nome do cliente");
         cliente.nome = leitura();
 
-        println!("Digite o cpf do cliente (sem caracteres especiais) ");
+        println!("Digite o CPF/CNPJ do cliente (sem caracteres especiais) ");
         cliente.cadastro = leitura();
+
+        println!("Insira o Telefone do cliente (também sem caracteres especiais)");
+        cliente.telefone  = leitura();
 
         println!("Campo de endereco\nCEP:");
         cliente.endereco.cep = leitura();
 
         println!("Logradouro (Rua/Av):");
         cliente.endereco.logradouro = leitura();
-        
+
         println!("Número:");
         cliente.endereco.numero = leitura();
-        
-        //sugestão do Gemini para um campo onde pode não haver resposta
+           //sugestão do Gemini para um campo onde pode não haver resposta{
         println!("Complemento (Pressione Enter se não houver):");
 
         // Se a string NÃO estiver vazia, vira Some(entrada), se estiver vazia, vira None
         cliente.endereco.complemento = Some(leitura()).filter(|s| !s.trim().is_empty());
-        
-        println!("Bairro:");
+
+         println!("Bairro:");
         cliente.endereco.bairro = leitura();
-        
+
         println!("Município:");
         cliente.endereco.municipio = leitura();
-        
+
         println!("UF (Ex: SP):");
         cliente.endereco.uf = leitura();
 
         println!("os dados estão corretos? (Sim/nao)");
         let opcao: String = leitura();
         if opcao.eq_ignore_ascii_case("sim") {
-
-            vec_clientes.push(cliente);
-            println!("cliente cadastrado com sucesso!");
-            break; 
-        
+            let resultado = incluir_cliente_db(conn_db, &cliente);
+            if resultado == Ok(()) {
+                println!("cliente cadastrado com sucesso!");
+                break; 
+            }else { 
+                println!("Erro ao gravar cliente no Banco de Dados")
+            }
         }
     }
 }
 
-pub fn listar_clientes(vec_clientes: &mut Vec<Cliente>){
+pub fn listar_clientes(conn_db: &Connection){
 
     limpar();
-    if vec_clientes.len() == 0 {
-        println!("não existem clientes cadastrados");
-        pausar(3);
-        return;
-    } 
+      println!("listagem de todos os clientes...");
+    pausar(2);
+    limpar();
+    println!("********** CLIENTES CADASTRADOS **********");
+    if let Ok(vec_cliente_result) =  listar_cliente_db(conn_db){
+        for cliente in vec_cliente_result {
+            println!("
+            ID: {}
+            Nome: {}
+            Cadastro: {}
+            Telefone: {}
+            ---Endereco---
+            CEP: {}
+            Logradouro: {}
+            Numero: {}
+            Complemento: {:?}
+            Bairro: {}
+            Município: {}
+            UF {}",
+            cliente.id,
+            cliente.nome,
+            cliente.cadastro,
+            cliente.telefone,
+            cliente.endereco.cep,
+            cliente.endereco.logradouro,
+            cliente.endereco.numero,
+            cliente.endereco.complemento,
+            cliente.endereco.bairro,
+            cliente.endereco.municipio,
+            cliente.endereco.uf
+            );
+            println!("******************************************");
+        }
+    }else { println!("não foi possivel listar os usuarios cadastrados no banco de dados...");}
+    println!("\nDigite algo para continuar");
+    leitura();
+}
+
+pub fn alterar_cliente (conn_db: &Connection){
+
+    limpar();
+    println!("insira o ID do cliente que deseja ataulizar");
+    let cliente_id : usize = leitura_dados();
     
-    println!("********** LISTAGEM **********");
-    for id in &mut *vec_clientes {
-        mostrar_cliente(id);
-        println!("******************************"); 
-    }
-     
-
-
+    if let Ok(mut cliente)  = selecao_cliente_db(conn_db, cliente_id){
+        entrada_dados(&mut cliente);
+        if let Ok(()) = atualizar_cliente_db(conn_db, &cliente, cliente_id){
+            println!("cliente alterado com sucesso!");
+            pausar(2);
+            return; 
+        }else{
+            println!("falha ao atualizar cliente no banco de dados");
+            pausar(2);
+            return;
+        }
+    }else{println!("falha ao selecionar o cliente no database")}
 }
 
-fn mostrar_cliente(cliente: &mut Cliente){
-
-    println!("\
-        ID: {}\n\
-        nome: {}\n\
-        CPF: {}\n\
-    ",cliente.id,cliente.nome,cliente.cadastro);
-    println!("Dados de endereço:");
-    mostrar_endereco(cliente);
-
-}
-
-pub fn alterar_cliente (vec_clientes: &mut Vec<Cliente>){
-
-    limpar();
-
-     if vec_clientes.len() == 0 {
-        println!("Não existem clientes cadastrados");
-        pausar(3);
-        return;
-    } 
-
-    println!("Digite o id do cliente que você deseja alterar");
-    let id: usize = leitura_dados();
-
-    //ajuda do gemini 
-   if let Some(cliente_encontrado) = vec_clientes.iter_mut().find(|c| c.id == id) {
-        entrada_dados(cliente_encontrado);
-    } else {
-        println!("Cliente com o ID {} não foi encontrado.", id);
-        pausar(3);
-    }
-    //estava tentando usar o id diretamente na fn entrada_dados mas ocorria um problema 
-
-}
 
 fn entrada_dados(cliente: &mut Cliente){
 
@@ -119,20 +130,22 @@ fn entrada_dados(cliente: &mut Cliente){
         -CPF-\n\
         -Endereco-\n\
         ");
-        
+
         let mut opcao: String = leitura();
         opcao = opcao.to_ascii_lowercase();
+        pausar(2);
+        limpar();
         match opcao.as_str() {
-            
+
             "nome" => {
                 println!("digite o novo nome do usuario");
                 cliente.nome= leitura();
             }
-                
+
             "cpf" => {
                 println!("digite o novo cpf do usuario");
                 cliente.cadastro = leitura();
-                
+
             }
             "endereco" => {
                 alterar_endereco(cliente);
@@ -142,12 +155,12 @@ fn entrada_dados(cliente: &mut Cliente){
                 pausar(2);
                 continue;
             }
-        
-        
+
+
         }
          println!("Deseja alterar mais alguma informação do cliente? (Sim/nao)");
-        let deseja_continuar = leitura();
-        if deseja_continuar.eq_ignore_ascii_case("nao") {
+         let opcao = leitura();
+        if opcao.eq_ignore_ascii_case("nao") {
             println!("Alterações de endereço salvas com sucesso!");
             pausar(2);
             break; 
@@ -155,60 +168,33 @@ fn entrada_dados(cliente: &mut Cliente){
     }
 }
 
-pub fn excluir_cliente(vec_cliente: &mut Vec<Cliente>) {
+pub fn excluir_cliente(conn_db: &Connection) {
 
     limpar();
-
-    if vec_cliente.len() == 0 {
-        println!("não existem clientes cadastrados");
-        pausar(3);
-        return;
-    }
-
-    println!("Digite o id do cliente que você deseja excluir");
-    let id: usize = leitura_dados();
-
-   if let Some(cliente_encontrado) = vec_cliente.iter().find(|c| c.id == id) {
-        println!("você tem certeza que deseja exluir permanentemente o cliente {}? (Sim/nao)", cliente_encontrado.nome);
-        
-        let opcao = leitura();
-        if opcao.eq_ignore_ascii_case("sim") {
-            println!("excluindo...");
-            //sugestão do gemini 
-            vec_cliente.retain(|c| c.id != id);
-            //segundo ele usando o retain manten-se apenas o que possuir o id d iferente do listado
+    println!("insira o ID do cliente que deseja excluir");
+    let cliente_id: usize = leitura_dados();
+    println!("você tem certeza ???\n(Sim/nao)");
+    let opcao: String = leitura();
+    if opcao.trim().eq_ignore_ascii_case("sim"){
+        limpar();
+        println!("excluindo cliente...");
+        let resultado  =  excluir_cliente_db(conn_db, cliente_id);
+        if resultado == Ok(()){
+                println!("Cliente excluido com sucesso!");
+                pausar(2);
+                return;
         }else{
-            println!("cancelando...");
+                    println!("Não foi possivel excluir o cliente solicitado");
+                pausar(2);
+                return;
         }
-    }else{
-        println!("Cliente com o ID {} não foi encontrado.", id);
-        pausar(3);
+    }else{ 
+        limpar();
+        println!("cancelando a exclusão...");
+        pausar(2);
     }
-
-    
-
-
-
 }
 
-pub fn mostrar_endereco(cliente: &Cliente) {
-    println!(
-        "CEP: {}\n\
-        logrdouro: {}\n\
-        numero: {}\n\
-        complemento: {}\n\
-        bairro: {}\n\
-        municipio: {}\n\
-        uf: {}\n",
-        cliente.endereco.cep,
-        cliente.endereco.logradouro, // Mantive com o nome do seu campo (sem o 'a')
-        cliente.endereco.numero,
-        cliente.endereco.complemento.as_deref().unwrap_or("Não informado"),
-        cliente.endereco.bairro,
-        cliente.endereco.municipio,
-        cliente.endereco.uf
-    );
-}
 
 fn alterar_endereco(cliente: &mut Cliente) {
     loop {
@@ -226,9 +212,12 @@ fn alterar_endereco(cliente: &mut Cliente) {
 
         let mut opcao: String = leitura();
         opcao = opcao.trim().to_ascii_lowercase();
+        pausar(2);
+        limpar();
 
         match opcao.as_str() {
             "cep" => {
+
                 println!("Digite o novo CEP:");
                 cliente.endereco.cep = leitura();
             }
@@ -266,11 +255,8 @@ fn alterar_endereco(cliente: &mut Cliente) {
         }
 
         println!("Deseja alterar mais alguma informação do endereço? (Sim/nao)");
-        let deseja_continuar = leitura();
-        if deseja_continuar.eq_ignore_ascii_case("nao") {
-            println!("Alterações de endereço salvas com sucesso!");
+              println!("Alterações de endereço salvas com sucesso!");
             pausar(2);
             break; 
         }
     }
-}

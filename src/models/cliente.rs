@@ -1,4 +1,4 @@
-// Substitua TODO o conteúdo de src/models/cliente.rs por isso:
+// Adicionar uma implementação(métodos de struct) para a verificação das informações que serão inseridas 
 
 #[derive(Default)]
 pub struct Endereco {
@@ -19,8 +19,9 @@ pub struct Cliente {
     pub nome: String,
     pub cadastro: String,
     pub endereco: Endereco,
-    //pub telefone: String,
+    pub telefone: String,
     //pub email: String,
 
 }
 
+    
