@@ -1,0 +1,12 @@
+android/
+ios/
+
+linux/
+macos/
+windows/
+
+.idea/
+.dart_tool/
+
+integration_test/
+web/
