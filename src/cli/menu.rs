@@ -3,8 +3,8 @@ use rusqlite::Connection;
 use crate::models::pedido::ItemPedido;
 
 use crate::cli::operacoes_basicas::*;
-use crate::cli::servico_cliente::*;
-use crate::cli::crud_pedidos::*;
+use crate::cli::clientes::*;
+use crate::cli::pedidos::*;
 use crate::cli::estoque::*;
 
 pub fn mostrar_menu(vec_itens: &mut Vec<ItemPedido>,conn_db: &mut Connection) {
@@ -119,8 +119,8 @@ pub fn mod_de_estoque(conn_db: &Connection){
             ********** MENU **********\n\
             Escolha uma das opções abaixo:\n\
             1 - Registrar entrada de itens no Estoque\n\
-            2 - Alterar dados do Estoque (ou Adicionar novas categorias de itens)\n\
-            3 - Listar itens do Estoque\n\
+            2 - Listar itens do Estoque\n\
+            3 - Adicionar novas categorias de itens\n\
             4 - Excluir dados do Estoque\n\
             0 - Voltar para o menu anterior\n\
         ");
@@ -131,9 +131,9 @@ pub fn mod_de_estoque(conn_db: &Connection){
 
         match opcao{
             1 => entrada_no_estoque(conn_db),
-            2 => println!("2"),
-            3 => listagem_do_estoque(conn_db),  
-            4 => println!("4"),
+            2 => listagem_do_estoque(conn_db),
+            3 => incluir_item(conn_db),  
+            4 => excluir_item(conn_db),
             0 => {  
                     println!("Voltando para o menu anterior"); 
                     return;

@@ -1,7 +1,7 @@
 use rusqlite::Connection;
 
-use crate::banco_de_dados::database_est::{checagem_estoque, saida_estoque_db};
-use crate::banco_de_dados::database_pd::*;
+use crate::banco_de_dados::db_estoque::{checagem_estoque, saida_estoque_db};
+use crate::banco_de_dados::db_pedidos::*;
 // esse arquivo possui o servico de CRUD para os pedidos
 use crate::models::pedido::{Pedido, ItemPedido};
 use crate::cli::operacoes_basicas::*;
@@ -81,7 +81,7 @@ fn itens_pedidos(vec_itens: &mut Vec<ItemPedido>, conn_db: &mut Connection) -> f
             Ok(true) =>{ 
                 novo_item.subtotal = novo_item.valor * (novo_item.quantidade as f64); //calcula o subtotal do item    
                 total += novo_item.subtotal;// soma do total do pedido
-                if let Err((Error)) = saida_estoque_db(conn_db, &novo_item){ //após a checagem do estoque e da confirmação das informações do item subtrai-se a qauntidade desejada do estoque
+                if let Err(_) = saida_estoque_db(conn_db, &novo_item){ //após a checagem do estoque e da confirmação das informações do item subtrai-se a qauntidade desejada do estoque
                     println!("Erro ao atualizar a quantidade do estoque");
                 }
                 vec_itens.push(novo_item);//salva efetivamente o item no vetor 

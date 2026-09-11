@@ -32,7 +32,7 @@ pub fn listagem_estoque_db(conn_db:  &Connection) -> Result<Vec<Produto>>{
     vec_produtos
 }
 
-pub fn checagem_estoque(conn_db:  &Connection, unidades: &usize, nome_merc: &String) -> Result<(bool)>{
+pub fn checagem_estoque(conn_db:  &Connection, unidades: &usize, nome_merc: &String) -> Result<bool>{
 
     let mut stmt = conn_db.prepare("
         SELECT quantidade_est - ?1 >= 0 
@@ -59,7 +59,24 @@ pub fn saida_estoque_db(conn_db:  &Connection, produto: &ItemPedido) -> Result<(
 
 }
 
+pub fn incluir_item_estoque_db(conn_db:  &Connection, nome_merc: String, quantidade_est: usize) -> Result<()>{
 
-// UPDATE nome_da_tabela 
-// SET nome_da_coluna = 'novo_valor' 
-// WHERE id = 1;
+    conn_db.execute("
+        INSERT INTO estoque (nome_merc,quantidade_est)
+        VALUES (?1,?2)
+        ",(nome_merc,quantidade_est))?;
+
+        Ok(())
+}
+
+pub fn excluir_item_estoque_db(conn_db: &Connection, item_id: usize) -> Result<()> {
+
+    conn_db.execute(
+        "DELETE FROM estoque
+        WHERE id_merc = ?
+        LIMIT 1",
+        [item_id] 
+    )?;
+
+    Ok(())
+}
