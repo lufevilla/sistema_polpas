@@ -2,7 +2,7 @@
 use rusqlite::{Connection};
 
 use crate::models::cliente::Cliente;
-use crate::banco_de_dados::database_cl::*;
+use crate::banco_de_dados::db_clientes::*;
 use crate::cli::operacoes_basicas::*;//crates vai pela origem
 
 pub fn incluir_cliente (conn_db: &Connection){
