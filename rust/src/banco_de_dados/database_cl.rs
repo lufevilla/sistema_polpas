@@ -80,3 +80,35 @@ pub fn pesquisa_cliente_db(nome_cliente: &String, cadastro_cliente: &String) -> 
 
 }
 
+pub fn listar_clientes_db() -> Result<Vec<Cliente>, AppError> {
+    let conn_db = obter_conexao()?;
+    let mut stmt = conn_db.prepare(
+        "SELECT id, nome, cadastro, telefone, cep, logradouro, numero, complemento, bairro, municipio, uf
+         FROM clientes"
+    )?;
+
+    let clientes = stmt.query_map([], |row| {
+        Ok(Cliente {
+            id: row.get(0)?,
+            nome: row.get(1)?,
+            cadastro: row.get(2)?,
+            telefone: row.get(3)?,
+            endereco: Endereco {
+                cep: row.get(4)?,
+                logradouro: row.get(5)?,
+                numero: row.get(6)?,
+                complemento: row.get(7)?,
+                bairro: row.get(8)?,
+                municipio: row.get(9)?,
+                uf: row.get(10)?,
+            },
+        })
+    })?;
+
+    let mut result = Vec::new();
+    for cliente in clientes {
+        result.push(cliente?);
+    }
+    Ok(result)
+}
+
