@@ -1,23 +1,25 @@
-#[derive(Default,Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Produto {
     pub id_merc: i64,
     pub nome_merc: String,
-    pub quantidade_est: i64
+    pub quantidade_est: i64,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct ItemPedido {
-    pub id_item: i64,  
+    pub id_item: i64,
     pub produto_nome: String,
     pub quantidade: i64,
     pub valor: f64,
-    pub subtotal: f64,  
+    pub subtotal: f64,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Pedido {
     pub id: i64,
-    pub cliente_id: i64, 
+    pub cliente_id: i64,
     pub itens: Vec<ItemPedido>,
     pub valor_total: f64,
     pub data: String,
