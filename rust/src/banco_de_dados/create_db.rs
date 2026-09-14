@@ -1,6 +1,8 @@
 use rusqlite::{Connection, Result};
 
-pub fn create_database () -> Result<Connection> {
+use crate::error::AppError;
+
+pub fn create_database () -> Result<Connection, AppError> {
 
     let conn_db = Connection::open("banco_de_dados.db").unwrap();
     conn_db.execute_batch("
@@ -45,4 +47,9 @@ pub fn create_database () -> Result<Connection> {
     ").unwrap();
 
     Ok(conn_db)
+}
+
+pub fn obter_conexao() -> Result<Connection, AppError> {
+    let conn = Connection::open("banco_de_dados.db")?;
+    Ok(conn)
 }
