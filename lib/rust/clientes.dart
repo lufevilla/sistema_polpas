@@ -20,3 +20,7 @@ Future<void> excluirCliente({
 }) {
   return excluirClienteService(cliente: cliente, clienteId: clienteId);
 }
+
+Future<List<Cliente>> listarClientes() {
+  return listarClientesService();
+}
