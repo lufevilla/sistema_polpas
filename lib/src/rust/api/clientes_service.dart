@@ -30,3 +30,6 @@ Future<void> excluirClienteService({
   cliente: cliente,
   clienteId: clienteId,
 );
+
+Future<List<Cliente>> listarClientesService() =>
+    RustLib.instance.api.crateApiClientesServiceListarClientesService();

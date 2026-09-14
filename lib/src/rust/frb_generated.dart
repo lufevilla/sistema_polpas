@@ -72,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -377969957;
+  int get rustContentHash => 1869867055;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -120,6 +120,8 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiSimpleInitApp();
 
   Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoqueService();
+
+  Future<List<Cliente>> crateApiClientesServiceListarClientesService();
 
   Future<List<Pedido>> crateApiPedidosServiceListarPedidosService();
 
@@ -471,7 +473,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService() {
+  Future<List<Cliente>> crateApiClientesServiceListarClientesService() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -480,6 +482,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_cliente,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiClientesServiceListarClientesServiceConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClientesServiceListarClientesServiceConstMeta =>
+      const TaskConstMeta(debugName: "listar_clientes_service", argNames: []);
+
+  @override
+  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
             port: port_,
           );
         },
@@ -512,7 +542,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 13,
             port: port_,
           );
         },
@@ -641,6 +671,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       valor: dco_decode_f_64(arr[3]),
       subtotal: dco_decode_f_64(arr[4]),
     );
+  }
+
+  @protected
+  List<Cliente> dco_decode_list_cliente(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_cliente).toList();
   }
 
   @protected
@@ -833,6 +869,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       valor: var_valor,
       subtotal: var_subtotal,
     );
+  }
+
+  @protected
+  List<Cliente> sse_decode_list_cliente(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Cliente>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_cliente(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -1040,6 +1088,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.quantidade, serializer);
     sse_encode_f_64(self.valor, serializer);
     sse_encode_f_64(self.subtotal, serializer);
+  }
+
+  @protected
+  void sse_encode_list_cliente(List<Cliente> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_cliente(item, serializer);
+    }
   }
 
   @protected
