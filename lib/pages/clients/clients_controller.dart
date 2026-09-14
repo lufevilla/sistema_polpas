@@ -147,9 +147,34 @@ class ClientesController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addCliente(Cliente cliente) {
+  Future<void> addCliente(Cliente cliente) async {
     _clientes.insert(0, cliente);
     notifyListeners();
+
+    try {
+      await incluir_cliente_service(
+        cliente: Cliente(
+          nome: cliente.nome,
+          cadastro: cliente.cadastro,
+          telefone: cliente.telefone,
+          endereco: Endereco(
+            cep: cliente.cep,
+            logradouro: cliente.logradouro,
+            numero: cliente.numero,
+            complemento: cliente.complemento,
+            bairro: cliente.bairro,
+            municipio: cliente.municipio,
+            uf: cliente.uf,
+          ),
+        ),
+      );
+    } catch (erro) {
+      _clientes.removeWhere((c) => c.cadastro == cliente.cadastro);
+      notifyListeners();
+
+      debugPrint('Erro ao persistir cliente no Rust: $erro');
+      rethrow;
+    }
   }
 
   void updateCliente(Cliente cliente) {

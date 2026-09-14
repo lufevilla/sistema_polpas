@@ -1,11 +1,14 @@
-use rusqlite::{Connection, Result, params};
+use rusqlite::{Result, params};
+use crate::error::AppError;
 use crate::models::cliente::*;
+use crate::create_db::obter_conexao;
 
 
 // todas as funções serão praticamente identica com a unica diferença sendo a função do sqlite e suas clausulas presentes  em cada uma delas 
 
-pub fn incluir_cliente_db(conn_db: &Connection, cliente: &Cliente) -> Result<()> { 
-        conn_db.execute(
+pub fn incluir_cliente_db( cliente: &Cliente) -> Result<(), AppError> { 
+        let conn_db = obter_conexao();
+        conn_db?.execute(
         "INSERT INTO clientes (nome, cadastro, telefone, cep, logradouro, numero, complemento, bairro, municipio, uf)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
         (
@@ -25,44 +28,14 @@ pub fn incluir_cliente_db(conn_db: &Connection, cliente: &Cliente) -> Result<()>
     Ok(())
 }
 
-pub fn selecao_cliente_db(conn_db: &Connection, cliente_id: usize) -> Result<Cliente>{
-
-    let mut stmt = conn_db.prepare("SELECT * FROM clientes WHERE id = ?")?;
-    let  cliente_selecionado = stmt.query_row([cliente_id], |row|{
-        
-        let endereco_cliente = Endereco {
-            cep: row.get(4)?,
-            logradouro: row.get(5)?,
-            numero: row.get(6)?,
-            complemento: row.get(7)?,
-            bairro: row.get(8)?,
-            municipio: row.get(9)?,
-            uf: row.get(10)?,
-        };
-
-
-        Ok( Cliente {
-            id: row.get(0)?,
-            nome: row.get(1)?,
-            cadastro: row.get(2)?,
-            telefone: row.get(3)?,
-            endereco: endereco_cliente,
-        })
-    }
-    )?;
+pub fn atualizar_cliente_db( cliente: &Cliente, cliente_id: i64) -> Result<(), AppError> {
     
-    Ok(cliente_selecionado)// toda vez que se usa o result, o retorno da fn deve estar 'embrulhada' dentro de um ok 
-
-}
-
-pub fn atualizar_cliente_db(conn_db: &Connection, cliente: &Cliente, cliente_id: usize) -> Result<()> {
-    
+    let conn_db = obter_conexao()?;
     conn_db.execute(
         "UPDATE clientes
          SET nome = ?1, cadastro = ?2, cep = ?3, logradouro = ?4, 
              numero = ?5, complemento = ?6, bairro = ?7, municipio = ?8, uf = ?9 
-         WHERE id = ?10",//where é uma clausula que age como um filtro, selecionando somente o cliente desejado 
-                         //se essa clausula não estiver presente o sqlite irá alterar todas as linhas do DB 
+         WHERE id = ?10",
         (
             &cliente.nome,
             &cliente.cadastro,
@@ -80,37 +53,9 @@ pub fn atualizar_cliente_db(conn_db: &Connection, cliente: &Cliente, cliente_id:
     Ok(())//retorno de result 
 }
 
-pub fn listar_cliente_db(conn_db: &Connection) -> Result<Vec<Cliente>> {
+pub fn excluir_cliente_db (cliente_id: i64) -> Result<(),AppError> {
 
-    let mut stmt = conn_db.prepare("SELECT *FROM clientes ")?;
-    let clientes_iter = stmt.query_map([], |row| {
-
-        let endereco_cliente = Endereco {
-            cep: row.get(4)?,
-            logradouro: row.get(5)?,
-            numero: row.get(6)?,
-            complemento: row.get(7)?,
-            bairro: row.get(8)?,
-            municipio: row.get(9)?,
-            uf: row.get(10)?,
-        };
-
-
-        Ok( Cliente {
-            id: row.get(0)?,
-            nome: row.get(1)?,
-            cadastro: row.get(2)?,
-            telefone: row.get(3)?,
-            endereco: endereco_cliente,
-        })
-    })?;
-    let vec_clientes_result: Result<Vec<Cliente>> = clientes_iter.collect();
-
-    vec_clientes_result
-}
-
-pub fn excluir_cliente_db(conn_db: &Connection, cliente_id: usize) -> Result<()> {
-
+    let conn_db = obter_conexao()?;
     conn_db.execute(
         "DELETE FROM clientes
         WHERE id = ?
@@ -120,3 +65,18 @@ pub fn excluir_cliente_db(conn_db: &Connection, cliente_id: usize) -> Result<()>
 
     Ok(())
 }
+
+
+pub fn pesquisa_cliente_db(nome_cliente: &String, cadastro_cliente: &String) -> Result<bool, AppError>{
+
+    let conn_db = obter_conexao()?;
+    let existe: bool = conn_db.query_row(
+        "SELECT EXISTS(SELECT 1 FROM usuarios WHERE nome = ? AND cadastro = ?)",
+        [nome_cliente,cadastro_cliente],
+
+        |row| row.get(0),// o DB retorna um true ou false se ele achar algo
+    )?;
+    Ok(!existe)// como se espera que não tenha niguém com esses dados, o banco vai retornar um false("não existe niguém com esse valores aqui"), aí a fn que está chamando essa receberá um true, que é o oposto(para ser uma espécie de sinal verde pra prosseguir)
+
+}
+

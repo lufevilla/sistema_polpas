@@ -15,7 +15,7 @@ pub struct Endereco {
 
 #[derive(Default)]
 pub struct Cliente {
-    pub id: usize,
+    pub id: i64,
     pub nome: String,
     pub cadastro: String,
     pub endereco: Endereco,
