@@ -70,6 +70,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ItemPedido dco_decode_item_pedido(dynamic raw);
 
   @protected
+  List<Cliente> dco_decode_list_cliente(dynamic raw);
+
+  @protected
   List<ItemPedido> dco_decode_list_item_pedido(dynamic raw);
 
   @protected
@@ -137,6 +140,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ItemPedido sse_decode_item_pedido(SseDeserializer deserializer);
+
+  @protected
+  List<Cliente> sse_decode_list_cliente(SseDeserializer deserializer);
 
   @protected
   List<ItemPedido> sse_decode_list_item_pedido(SseDeserializer deserializer);
@@ -214,6 +220,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_item_pedido(ItemPedido self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_cliente(List<Cliente> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_item_pedido(
