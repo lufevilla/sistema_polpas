@@ -3,12 +3,18 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/clientes_service.dart';
+import 'api/estoque_service.dart';
+import 'api/pedidos_service.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'error.dart';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'models/cliente.dart';
+import 'models/pedido.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API
@@ -66,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1918914929;
+  int get rustContentHash => -377969957;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -78,9 +84,57 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<void> crateApiClientesServiceAtualizarClienteService({
+    required Cliente cliente,
+    required PlatformInt64 clienteId,
+  });
+
+  Future<void> crateApiEstoqueServiceEntradaNoEstoqueService({
+    required Produto produto,
+  });
+
+  Future<void> crateApiClientesServiceExcluirClienteService({
+    required Cliente cliente,
+    required PlatformInt64 clienteId,
+  });
+
+  Future<void> crateApiEstoqueServiceExcluirItemEstoqueService({
+    required PlatformInt64 itemId,
+  });
+
+  Future<void> crateApiPedidosServiceExcluirPedidoService({
+    required PlatformInt64 pedidoId,
+  });
+
   String crateApiSimpleGreet({required String name});
 
+  Future<void> crateApiClientesServiceIncluirClienteService({
+    required Cliente cliente,
+  });
+
+  Future<void> crateApiEstoqueServiceIncluirItemEstoqueService({
+    required String nomeMerc,
+    required PlatformInt64 quantidadeEst,
+  });
+
   Future<void> crateApiSimpleInitApp();
+
+  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoqueService();
+
+  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService();
+
+  Future<void> crateApiPedidosServiceNovoPedidoService({
+    required Pedido pedido,
+    required List<ItemPedido> itens,
+  });
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_AppError;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_AppError;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_AppErrorPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -92,13 +146,187 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<void> crateApiClientesServiceAtualizarClienteService({
+    required Cliente cliente,
+    required PlatformInt64 clienteId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_cliente(cliente, serializer);
+          sse_encode_i_64(clienteId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiClientesServiceAtualizarClienteServiceConstMeta,
+        argValues: [cliente, clienteId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClientesServiceAtualizarClienteServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "atualizar_cliente_service",
+        argNames: ["cliente", "clienteId"],
+      );
+
+  @override
+  Future<void> crateApiEstoqueServiceEntradaNoEstoqueService({
+    required Produto produto,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_produto(produto, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiEstoqueServiceEntradaNoEstoqueServiceConstMeta,
+        argValues: [produto],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceEntradaNoEstoqueServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "entrada_no_estoque_service",
+        argNames: ["produto"],
+      );
+
+  @override
+  Future<void> crateApiClientesServiceExcluirClienteService({
+    required Cliente cliente,
+    required PlatformInt64 clienteId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_cliente(cliente, serializer);
+          sse_encode_i_64(clienteId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiClientesServiceExcluirClienteServiceConstMeta,
+        argValues: [cliente, clienteId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClientesServiceExcluirClienteServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "excluir_cliente_service",
+        argNames: ["cliente", "clienteId"],
+      );
+
+  @override
+  Future<void> crateApiEstoqueServiceExcluirItemEstoqueService({
+    required PlatformInt64 itemId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(itemId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiEstoqueServiceExcluirItemEstoqueServiceConstMeta,
+        argValues: [itemId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceExcluirItemEstoqueServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "excluir_item_estoque_service",
+        argNames: ["itemId"],
+      );
+
+  @override
+  Future<void> crateApiPedidosServiceExcluirPedidoService({
+    required PlatformInt64 pedidoId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(pedidoId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiPedidosServiceExcluirPedidoServiceConstMeta,
+        argValues: [pedidoId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPedidosServiceExcluirPedidoServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "excluir_pedido_service",
+        argNames: ["pedidoId"],
+      );
+
+  @override
   String crateApiSimpleGreet({required String name}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -115,6 +343,76 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "greet", argNames: ["name"]);
 
   @override
+  Future<void> crateApiClientesServiceIncluirClienteService({
+    required Cliente cliente,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_cliente(cliente, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 7,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiClientesServiceIncluirClienteServiceConstMeta,
+        argValues: [cliente],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiClientesServiceIncluirClienteServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "incluir_cliente_service",
+        argNames: ["cliente"],
+      );
+
+  @override
+  Future<void> crateApiEstoqueServiceIncluirItemEstoqueService({
+    required String nomeMerc,
+    required PlatformInt64 quantidadeEst,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(nomeMerc, serializer);
+          sse_encode_i_64(quantidadeEst, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiEstoqueServiceIncluirItemEstoqueServiceConstMeta,
+        argValues: [nomeMerc, quantidadeEst],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceIncluirItemEstoqueServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "incluir_item_estoque_service",
+        argNames: ["nomeMerc", "quantidadeEst"],
+      );
+
+  @override
   Future<void> crateApiSimpleInitApp() {
     return handler.executeNormal(
       NormalTask(
@@ -123,7 +421,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 9,
             port: port_,
           );
         },
@@ -141,6 +439,127 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSimpleInitAppConstMeta =>
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
+  @override
+  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoqueService() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_produto,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiEstoqueServiceListagemDoEstoqueServiceConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceListagemDoEstoqueServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "listagem_do_estoque_service",
+        argNames: [],
+      );
+
+  @override
+  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 11,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_pedido,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiPedidosServiceListarPedidosServiceConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPedidosServiceListarPedidosServiceConstMeta =>
+      const TaskConstMeta(debugName: "listar_pedidos_service", argNames: []);
+
+  @override
+  Future<void> crateApiPedidosServiceNovoPedidoService({
+    required Pedido pedido,
+    required List<ItemPedido> itens,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_pedido(pedido, serializer);
+          sse_encode_list_item_pedido(itens, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiPedidosServiceNovoPedidoServiceConstMeta,
+        argValues: [pedido, itens],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPedidosServiceNovoPedidoServiceConstMeta =>
+      const TaskConstMeta(
+        debugName: "novo_pedido_service",
+        argNames: ["pedido", "itens"],
+      );
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_AppError => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_AppError => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError;
+
+  @protected
+  AppError
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AppErrorImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  AppError
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AppErrorImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
   @protected
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -148,9 +567,138 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Cliente dco_decode_box_autoadd_cliente(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_cliente(raw);
+  }
+
+  @protected
+  Pedido dco_decode_box_autoadd_pedido(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_pedido(raw);
+  }
+
+  @protected
+  Produto dco_decode_box_autoadd_produto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_produto(raw);
+  }
+
+  @protected
+  Cliente dco_decode_cliente(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return Cliente(
+      id: dco_decode_i_64(arr[0]),
+      nome: dco_decode_String(arr[1]),
+      cadastro: dco_decode_String(arr[2]),
+      endereco: dco_decode_endereco(arr[3]),
+      telefone: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  Endereco dco_decode_endereco(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return Endereco(
+      cep: dco_decode_String(arr[0]),
+      logradouro: dco_decode_String(arr[1]),
+      numero: dco_decode_String(arr[2]),
+      complemento: dco_decode_opt_String(arr[3]),
+      bairro: dco_decode_String(arr[4]),
+      municipio: dco_decode_String(arr[5]),
+      uf: dco_decode_String(arr[6]),
+    );
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeI64(raw);
+  }
+
+  @protected
+  ItemPedido dco_decode_item_pedido(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ItemPedido(
+      idItem: dco_decode_i_64(arr[0]),
+      produtoNome: dco_decode_String(arr[1]),
+      quantidade: dco_decode_i_64(arr[2]),
+      valor: dco_decode_f_64(arr[3]),
+      subtotal: dco_decode_f_64(arr[4]),
+    );
+  }
+
+  @protected
+  List<ItemPedido> dco_decode_list_item_pedido(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_item_pedido).toList();
+  }
+
+  @protected
+  List<Pedido> dco_decode_list_pedido(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_pedido).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  List<Produto> dco_decode_list_produto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_produto).toList();
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  Pedido dco_decode_pedido(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return Pedido(
+      id: dco_decode_i_64(arr[0]),
+      clienteId: dco_decode_i_64(arr[1]),
+      itens: dco_decode_list_item_pedido(arr[2]),
+      valorTotal: dco_decode_f_64(arr[3]),
+      data: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  Produto dco_decode_produto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return Produto(
+      idMerc: dco_decode_i_64(arr[0]),
+      nomeMerc: dco_decode_String(arr[1]),
+      quantidadeEst: dco_decode_i_64(arr[2]),
+    );
   }
 
   @protected
@@ -166,6 +714,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  AppError
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return AppErrorImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  AppError
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return AppErrorImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -173,10 +751,172 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Cliente sse_decode_box_autoadd_cliente(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_cliente(deserializer));
+  }
+
+  @protected
+  Pedido sse_decode_box_autoadd_pedido(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_pedido(deserializer));
+  }
+
+  @protected
+  Produto sse_decode_box_autoadd_produto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_produto(deserializer));
+  }
+
+  @protected
+  Cliente sse_decode_cliente(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_64(deserializer);
+    var var_nome = sse_decode_String(deserializer);
+    var var_cadastro = sse_decode_String(deserializer);
+    var var_endereco = sse_decode_endereco(deserializer);
+    var var_telefone = sse_decode_String(deserializer);
+    return Cliente(
+      id: var_id,
+      nome: var_nome,
+      cadastro: var_cadastro,
+      endereco: var_endereco,
+      telefone: var_telefone,
+    );
+  }
+
+  @protected
+  Endereco sse_decode_endereco(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_cep = sse_decode_String(deserializer);
+    var var_logradouro = sse_decode_String(deserializer);
+    var var_numero = sse_decode_String(deserializer);
+    var var_complemento = sse_decode_opt_String(deserializer);
+    var var_bairro = sse_decode_String(deserializer);
+    var var_municipio = sse_decode_String(deserializer);
+    var var_uf = sse_decode_String(deserializer);
+    return Endereco(
+      cep: var_cep,
+      logradouro: var_logradouro,
+      numero: var_numero,
+      complemento: var_complemento,
+      bairro: var_bairro,
+      municipio: var_municipio,
+      uf: var_uf,
+    );
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getPlatformInt64();
+  }
+
+  @protected
+  ItemPedido sse_decode_item_pedido(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_idItem = sse_decode_i_64(deserializer);
+    var var_produtoNome = sse_decode_String(deserializer);
+    var var_quantidade = sse_decode_i_64(deserializer);
+    var var_valor = sse_decode_f_64(deserializer);
+    var var_subtotal = sse_decode_f_64(deserializer);
+    return ItemPedido(
+      idItem: var_idItem,
+      produtoNome: var_produtoNome,
+      quantidade: var_quantidade,
+      valor: var_valor,
+      subtotal: var_subtotal,
+    );
+  }
+
+  @protected
+  List<ItemPedido> sse_decode_list_item_pedido(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ItemPedido>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_item_pedido(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Pedido> sse_decode_list_pedido(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Pedido>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_pedido(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<Produto> sse_decode_list_produto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Produto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_produto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Pedido sse_decode_pedido(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_64(deserializer);
+    var var_clienteId = sse_decode_i_64(deserializer);
+    var var_itens = sse_decode_list_item_pedido(deserializer);
+    var var_valorTotal = sse_decode_f_64(deserializer);
+    var var_data = sse_decode_String(deserializer);
+    return Pedido(
+      id: var_id,
+      clienteId: var_clienteId,
+      itens: var_itens,
+      valorTotal: var_valorTotal,
+      data: var_data,
+    );
+  }
+
+  @protected
+  Produto sse_decode_produto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_idMerc = sse_decode_i_64(deserializer);
+    var var_nomeMerc = sse_decode_String(deserializer);
+    var var_quantidadeEst = sse_decode_i_64(deserializer);
+    return Produto(
+      idMerc: var_idMerc,
+      nomeMerc: var_nomeMerc,
+      quantidadeEst: var_quantidadeEst,
+    );
   }
 
   @protected
@@ -188,6 +928,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -203,9 +949,118 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    AppError self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as AppErrorImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError(
+    AppError self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as AppErrorImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_cliente(Cliente self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_cliente(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_pedido(Pedido self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_pedido(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_produto(Produto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_produto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_cliente(Cliente self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.id, serializer);
+    sse_encode_String(self.nome, serializer);
+    sse_encode_String(self.cadastro, serializer);
+    sse_encode_endereco(self.endereco, serializer);
+    sse_encode_String(self.telefone, serializer);
+  }
+
+  @protected
+  void sse_encode_endereco(Endereco self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.cep, serializer);
+    sse_encode_String(self.logradouro, serializer);
+    sse_encode_String(self.numero, serializer);
+    sse_encode_opt_String(self.complemento, serializer);
+    sse_encode_String(self.bairro, serializer);
+    sse_encode_String(self.municipio, serializer);
+    sse_encode_String(self.uf, serializer);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putPlatformInt64(self);
+  }
+
+  @protected
+  void sse_encode_item_pedido(ItemPedido self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.idItem, serializer);
+    sse_encode_String(self.produtoNome, serializer);
+    sse_encode_i_64(self.quantidade, serializer);
+    sse_encode_f_64(self.valor, serializer);
+    sse_encode_f_64(self.subtotal, serializer);
+  }
+
+  @protected
+  void sse_encode_list_item_pedido(
+    List<ItemPedido> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_item_pedido(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_pedido(List<Pedido> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_pedido(item, serializer);
+    }
   }
 
   @protected
@@ -216,6 +1071,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_produto(List<Produto> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_produto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_pedido(Pedido self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.id, serializer);
+    sse_encode_i_64(self.clienteId, serializer);
+    sse_encode_list_item_pedido(self.itens, serializer);
+    sse_encode_f_64(self.valorTotal, serializer);
+    sse_encode_String(self.data, serializer);
+  }
+
+  @protected
+  void sse_encode_produto(Produto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.idMerc, serializer);
+    sse_encode_String(self.nomeMerc, serializer);
+    sse_encode_i_64(self.quantidadeEst, serializer);
   }
 
   @protected
@@ -230,6 +1122,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
@@ -240,4 +1138,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
   }
+}
+
+@sealed
+class AppErrorImpl extends RustOpaque implements AppError {
+  // Not to be used by end users
+  AppErrorImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  AppErrorImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_AppError,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_AppError,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_AppErrorPtr,
+  );
 }
