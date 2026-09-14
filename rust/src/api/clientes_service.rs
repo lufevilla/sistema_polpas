@@ -1,5 +1,3 @@
-use rusqlite::Error;
-
 use crate::{models::cliente::Cliente, banco_de_dados::database_cl::*, error::AppError};
 
 #[flutter_rust_bridge::frb]

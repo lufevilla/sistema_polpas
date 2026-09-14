@@ -1,4 +1,4 @@
-use crate::banco_de_dados::database_est::{checagem_estoque, saida_estoque_db};
+use crate::banco_de_dados::database_est::saida_estoque_db;
 use crate::banco_de_dados::database_pd::*;
 use crate::models::pedido::{Pedido, ItemPedido};
 use crate::error::AppError;
