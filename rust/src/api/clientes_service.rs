@@ -22,6 +22,11 @@ pub async fn excluir_cliente_service(cliente: Cliente, cliente_id: i64) -> Resul
     excluir_cliente_db(cliente_id)
 }
 
+#[flutter_rust_bridge::frb]
+pub async fn listar_clientes_service() -> Result<Vec<Cliente>, AppError> {
+    listar_clientes_db()
+}
+
 fn checagem_presenca_dados(cliente: &Cliente) -> Result<(), AppError> {
     let campos_obrigatorios = [
         ("Nome", cliente.nome.as_str()),
