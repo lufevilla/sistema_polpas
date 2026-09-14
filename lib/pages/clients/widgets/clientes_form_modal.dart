@@ -51,19 +51,23 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
   late final _nome = TextEditingController(text: widget.cliente?.nome);
   late final _cadastro = TextEditingController(text: widget.cliente?.cadastro);
   late final _telefone = TextEditingController(text: widget.cliente?.telefone);
-  late final _cep = TextEditingController(text: widget.cliente?.cep);
+  late final _cep = TextEditingController(text: widget.cliente?.endereco.cep);
   late final _logradouro = TextEditingController(
-    text: widget.cliente?.logradouro,
+    text: widget.cliente?.endereco.logradouro,
   );
-  late final _numero = TextEditingController(text: widget.cliente?.numero);
+  late final _numero = TextEditingController(
+    text: widget.cliente?.endereco.numero,
+  );
   late final _complemento = TextEditingController(
-    text: widget.cliente?.complemento,
+    text: widget.cliente?.endereco.complemento,
   );
-  late final _bairro = TextEditingController(text: widget.cliente?.bairro);
+  late final _bairro = TextEditingController(
+    text: widget.cliente?.endereco.bairro,
+  );
   late final _municipio = TextEditingController(
-    text: widget.cliente?.municipio,
+    text: widget.cliente?.endereco.municipio,
   );
-  late final _uf = TextEditingController(text: widget.cliente?.uf);
+  late final _uf = TextEditingController(text: widget.cliente?.endereco.uf);
 
   bool get _isEditingExisting => widget.cliente != null;
   // Cadastro novo já começa em modo de edição; cadastro existente começa
@@ -95,15 +99,17 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
       nome: _nome.text.trim(),
       cadastro: _cadastro.text.trim(),
       telefone: _telefone.text.trim(),
-      cep: _cep.text.trim(),
-      logradouro: _logradouro.text.trim(),
-      numero: _numero.text.trim(),
-      complemento: _complemento.text.trim().isEmpty
-          ? null
-          : _complemento.text.trim(),
-      bairro: _bairro.text.trim(),
-      municipio: _municipio.text.trim(),
-      uf: _uf.text.trim(),
+      endereco: Endereco(
+        cep: _cep.text.trim(),
+        logradouro: _logradouro.text.trim(),
+        numero: _numero.text.trim(),
+        complemento: _complemento.text.trim().isEmpty
+            ? null
+            : _complemento.text.trim(),
+        bairro: _bairro.text.trim(),
+        municipio: _municipio.text.trim(),
+        uf: _uf.text.trim(),
+      ),
       status: widget.cliente?.status ?? ClienteStatus.pendente,
     );
 

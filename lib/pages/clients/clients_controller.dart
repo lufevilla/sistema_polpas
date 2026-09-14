@@ -11,11 +11,7 @@ enum ClienteStatus { ativo, pendente }
 /// `clients`:
 /// nome, cadastro (único), telefone, cep, logradouro, numero,
 /// complemento (opcional), bairro, municipio, uf.
-class Cliente {
-  final String id;
-  final String nome;
-  final String cadastro; // TEXT UNIQUE NOT NULL (ex: CPF/CNPJ)
-  final String telefone;
+class Endereco {
   final String cep;
   final String logradouro;
   final String numero;
@@ -23,13 +19,8 @@ class Cliente {
   final String bairro;
   final String municipio;
   final String uf;
-  final ClienteStatus status;
 
-  const Cliente({
-    required this.id,
-    required this.nome,
-    required this.cadastro,
-    required this.telefone,
+  const Endereco({
     required this.cep,
     required this.logradouro,
     required this.numero,
@@ -37,8 +28,25 @@ class Cliente {
     required this.bairro,
     required this.municipio,
     required this.uf,
+  });
+}
+
+class Cliente {
+  final String id;
+  final String nome;
+  final String cadastro; // TEXT UNIQUE NOT NULL (ex: CPF/CNPJ)
+  final String telefone;
+  final ClienteStatus status;
+  final Endereco endereco;
+  const Cliente({
+    required this.id,
+    required this.nome,
+    required this.cadastro,
+    required this.telefone,
+    required this.endereco,
     this.status = ClienteStatus.ativo,
   });
+
 
   /// Iniciais para o avatar (ex: "Maria Auxiliadora" -> "MA").
   String get iniciais {
@@ -53,13 +61,7 @@ class Cliente {
     String? nome,
     String? cadastro,
     String? telefone,
-    String? cep,
-    String? logradouro,
-    String? numero,
-    String? complemento,
-    String? bairro,
-    String? municipio,
-    String? uf,
+    Endereco? endereco,
     ClienteStatus? status,
   }) {
     return Cliente(
@@ -67,13 +69,7 @@ class Cliente {
       nome: nome ?? this.nome,
       cadastro: cadastro ?? this.cadastro,
       telefone: telefone ?? this.telefone,
-      cep: cep ?? this.cep,
-      logradouro: logradouro ?? this.logradouro,
-      numero: numero ?? this.numero,
-      complemento: complemento ?? this.complemento,
-      bairro: bairro ?? this.bairro,
-      municipio: municipio ?? this.municipio,
-      uf: uf ?? this.uf,
+      endereco: endereco ?? this.endereco,
       status: status ?? this.status,
     );
   }
@@ -89,12 +85,14 @@ class ClientesController extends ChangeNotifier {
       nome: 'Maria Auxiliadora',
       cadastro: '111.222.333-44',
       telefone: '(85) 98822-4455',
-      cep: '63000-000',
-      logradouro: 'Rua das Acácias',
-      numero: '120',
-      bairro: 'Centro',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
+      endereco: Endereco(
+        cep: '63000-000',
+        logradouro: 'Rua das Acácias',
+        numero: '120',
+        bairro: 'Centro',
+        municipio: 'Juazeiro do Norte',
+        uf: 'CE',
+      ),
       status: ClienteStatus.ativo,
     ),
     const Cliente(
@@ -102,13 +100,15 @@ class ClientesController extends ChangeNotifier {
       nome: 'João Paulo Silva',
       cadastro: '222.333.444-55',
       telefone: '(85) 99744-1122',
-      cep: '63010-000',
-      logradouro: 'Av. Padre Cícero',
-      numero: '850',
-      complemento: 'Apto 302',
-      bairro: 'São Miguel',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
+      endereco: Endereco(
+        cep: '63010-000',
+        logradouro: 'Av. Padre Cícero',
+        numero: '850',
+        complemento: 'Apto 302',
+        bairro: 'São Miguel',
+        municipio: 'Juazeiro do Norte',
+        uf: 'CE',
+      ),
       status: ClienteStatus.pendente,
     ),
     const Cliente(
@@ -116,12 +116,14 @@ class ClientesController extends ChangeNotifier {
       nome: 'Ricardo Lemos',
       cadastro: '333.444.555-66',
       telefone: '(85) 98122-3344',
-      cep: '63020-000',
-      logradouro: 'Rua José de Alencar',
-      numero: '45',
-      bairro: 'Franciscanos',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
+      endereco: Endereco(
+        cep: '63020-000',
+        logradouro: 'Rua José de Alencar',
+        numero: '45',
+        bairro: 'Franciscanos',
+        municipio: 'Juazeiro do Norte',
+        uf: 'CE',
+      ),
       status: ClienteStatus.ativo,
     ),
   ];
@@ -151,30 +153,8 @@ class ClientesController extends ChangeNotifier {
     _clientes.insert(0, cliente);
     notifyListeners();
 
-    try {
-      await incluir_cliente_service(
-        cliente: Cliente(
-          nome: cliente.nome,
-          cadastro: cliente.cadastro,
-          telefone: cliente.telefone,
-          endereco: Endereco(
-            cep: cliente.cep,
-            logradouro: cliente.logradouro,
-            numero: cliente.numero,
-            complemento: cliente.complemento,
-            bairro: cliente.bairro,
-            municipio: cliente.municipio,
-            uf: cliente.uf,
-          ),
-        ),
-      );
-    } catch (erro) {
-      _clientes.removeWhere((c) => c.cadastro == cliente.cadastro);
-      notifyListeners();
-
-      debugPrint('Erro ao persistir cliente no Rust: $erro');
-      rethrow;
-    }
+    // TODO: chamar incluir_cliente_service quando o bridge Rust gerar
+    // await incluir_cliente_service(cliente: cliente);
   }
 
   void updateCliente(Cliente cliente) {
