@@ -1,7 +1,7 @@
 use rusqlite::{Result, params};
 use crate::error::AppError;
 use crate::models::cliente::*;
-use crate::create_db::obter_conexao;
+use crate::banco_de_dados::create_db::obter_conexao;
 
 
 // todas as funções serão praticamente identica com a unica diferença sendo a função do sqlite e suas clausulas presentes  em cada uma delas 
