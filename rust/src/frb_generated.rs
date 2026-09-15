@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -377969957;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1869867055;
 
 // Section: executor
 
@@ -423,6 +423,42 @@ fn wire__crate__api__estoque_service__listagem_do_estoque_service_impl(
         },
     )
 }
+fn wire__crate__api__clientes_service__listar_clientes_service_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "listar_clientes_service",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, AppError>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::clientes_service::listar_clientes_service().await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__pedidos_service__listar_pedidos_service_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -604,6 +640,18 @@ impl SseDecode for crate::models::pedido::ItemPedido {
             valor: var_valor,
             subtotal: var_subtotal,
         };
+    }
+}
+
+impl SseDecode for Vec<crate::models::cliente::Cliente> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::cliente::Cliente>::sse_decode(deserializer));
+        }
+        return ans_;
     }
 }
 
@@ -791,13 +839,19 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__pedidos_service__listar_pedidos_service_impl(
+        11 => wire__crate__api__clientes_service__listar_clientes_service_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__pedidos_service__novo_pedido_service_impl(
+        12 => wire__crate__api__pedidos_service__listar_pedidos_service_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        13 => wire__crate__api__pedidos_service__novo_pedido_service_impl(
             port,
             ptr,
             rust_vec_len,
@@ -1026,6 +1080,16 @@ impl SseEncode for crate::models::pedido::ItemPedido {
         <i64>::sse_encode(self.quantidade, serializer);
         <f64>::sse_encode(self.valor, serializer);
         <f64>::sse_encode(self.subtotal, serializer);
+    }
+}
+
+impl SseEncode for Vec<crate::models::cliente::Cliente> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::cliente::Cliente>::sse_encode(item, serializer);
+        }
     }
 }
 

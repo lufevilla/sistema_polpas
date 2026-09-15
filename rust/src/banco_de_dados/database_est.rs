@@ -33,7 +33,7 @@ pub fn listagem_estoque_db(conn_db:  &Connection) -> Result<Vec<Produto>>{
     vec_produtos
 }
 
-pub fn checagem_estoque(conn_db:  &Connection, unidades: &usize, nome_merc: &String) -> Result<(bool)>{
+pub fn checagem_estoque(conn_db: &Connection, unidades: &i64, nome_merc: &String) -> Result<bool> {
 
     let mut stmt = conn_db.prepare("
         SELECT quantidade_est - ?1 >= 0 

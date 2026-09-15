@@ -25,6 +25,6 @@ pub async fn listar_pedidos_service() -> Result<Vec<Pedido>, AppError> {
 #[flutter_rust_bridge::frb]
 pub async fn excluir_pedido_service(pedido_id: i64) -> Result<(), AppError> {
     let conn_db = obter_conexao()?;
-    excluir_pedido_db(&conn_db, pedido_id as usize)?;
+    excluir_pedido_db(&conn_db, pedido_id)?;
     Ok(())
 }
