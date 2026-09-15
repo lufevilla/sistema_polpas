@@ -97,7 +97,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
 
   late int? _clienteId = widget.pedido?.clienteId;
   late DateTime _data = widget.pedido?.data ?? DateTime.now();
-  late salestatus _status = widget.pedido?.status ?? salestatus.pendente;
+  late SaleStatus _status = widget.pedido?.status ?? SaleStatus.pendente;
 
   late final List<_ItemDraft> _itens = widget.itensIniciais.isNotEmpty
       ? widget.itensIniciais
@@ -353,12 +353,12 @@ class _VendaFormModalState extends State<_VendaFormModal> {
   }
 
   Widget _statusField() {
-    return DropdownButtonFormField<salestatus>(
+    return DropdownButtonFormField<SaleStatus>(
       initialValue: _status,
       items: const [
-        DropdownMenuItem(value: salestatus.pendente, child: Text('Pendente')),
-        DropdownMenuItem(value: salestatus.pago, child: Text('Pago')),
-        DropdownMenuItem(value: salestatus.entregue, child: Text('Entregue')),
+        DropdownMenuItem(value: SaleStatus.pendente, child: Text('Pendente')),
+        DropdownMenuItem(value: SaleStatus.pago, child: Text('Pago')),
+        DropdownMenuItem(value: SaleStatus.entregue, child: Text('Entregue')),
       ],
       onChanged: _isEditable
           ? (value) => setState(() => _status = value!)
@@ -384,6 +384,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                 child: TextFormField(
                   controller: item.produtoNome,
                   enabled: _isEditable,
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Produto', dense: true),
                   validator: (value) => (value == null || value.trim().isEmpty)
@@ -410,6 +411,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                   controller: item.quantidade,
                   enabled: _isEditable,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Qtd.', dense: true),
                   validator: (value) {
@@ -427,6 +429,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  textInputAction: TextInputAction.done,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Valor unit.', dense: true),
                   validator: (value) {

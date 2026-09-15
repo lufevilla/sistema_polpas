@@ -5,8 +5,10 @@ linux/
 macos/
 windows/
 
+web/
+
 .idea/
 .dart_tool/
 
 integration_test/
-web/
+build/

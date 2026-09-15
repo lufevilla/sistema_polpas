@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_polpas/rust/clientes.dart' as rust;
 
-/// Status do cliente.
-/// TODO: esse campo NÃO faz parte do schema (`clients`) informado.
-/// Está aqui só para reproduzir o selo "Ativo"/"Pendente" do print — a
-/// regra real (ex: baseada em histórico de compras/pagamentos) deve
-/// substituir isso depois.
 enum ClienteStatus { ativo, pendente }
 
-/// Modelo do cliente, espelhando exatamente as colunas da tabela
-/// `clients`:
-/// nome, cadastro (único), telefone, cep, logradouro, numero,
-/// complemento (opcional), bairro, municipio, uf.
-class Cliente {
-  final String id;
-  final String nome;
-  final String cadastro; // TEXT UNIQUE NOT NULL (ex: CPF/CNPJ)
-  final String telefone;
+class EnderecoLocal {
   final String cep;
   final String logradouro;
   final String numero;
@@ -23,13 +11,8 @@ class Cliente {
   final String bairro;
   final String municipio;
   final String uf;
-  final ClienteStatus status;
 
-  const Cliente({
-    required this.id,
-    required this.nome,
-    required this.cadastro,
-    required this.telefone,
+  const EnderecoLocal({
     required this.cep,
     required this.logradouro,
     required this.numero,
@@ -37,10 +20,46 @@ class Cliente {
     required this.bairro,
     required this.municipio,
     required this.uf,
+  });
+
+  EnderecoLocal copyWith({
+    String? cep,
+    String? logradouro,
+    String? numero,
+    String? complemento,
+    String? bairro,
+    String? municipio,
+    String? uf,
+  }) {
+    return EnderecoLocal(
+      cep: cep ?? this.cep,
+      logradouro: logradouro ?? this.logradouro,
+      numero: numero ?? this.numero,
+      complemento: complemento ?? this.complemento,
+      bairro: bairro ?? this.bairro,
+      municipio: municipio ?? this.municipio,
+      uf: uf ?? this.uf,
+    );
+  }
+}
+
+class ClienteLocal {
+  final int id;
+  final String nome;
+  final String cadastro;
+  final String telefone;
+  final EnderecoLocal endereco;
+  final ClienteStatus status;
+
+  const ClienteLocal({
+    required this.id,
+    required this.nome,
+    required this.cadastro,
+    required this.telefone,
+    required this.endereco,
     this.status = ClienteStatus.ativo,
   });
 
-  /// Iniciais para o avatar (ex: "Maria Auxiliadora" -> "MA").
   String get iniciais {
     final partes = nome.trim().split(RegExp(r'\s+'));
     if (partes.isEmpty) return '';
@@ -49,143 +68,141 @@ class Cliente {
         .toUpperCase();
   }
 
-  Cliente copyWith({
+  ClienteLocal copyWith({
     String? nome,
     String? cadastro,
     String? telefone,
-    String? cep,
-    String? logradouro,
-    String? numero,
-    String? complemento,
-    String? bairro,
-    String? municipio,
-    String? uf,
+    EnderecoLocal? endereco,
     ClienteStatus? status,
   }) {
-    return Cliente(
+    return ClienteLocal(
       id: id,
       nome: nome ?? this.nome,
       cadastro: cadastro ?? this.cadastro,
       telefone: telefone ?? this.telefone,
-      cep: cep ?? this.cep,
-      logradouro: logradouro ?? this.logradouro,
-      numero: numero ?? this.numero,
-      complemento: complemento ?? this.complemento,
-      bairro: bairro ?? this.bairro,
-      municipio: municipio ?? this.municipio,
-      uf: uf ?? this.uf,
+      endereco: endereco ?? this.endereco,
       status: status ?? this.status,
     );
   }
 }
 
-/// Controller da aba Clientes: dados mockados + busca + CRUD em memória.
-/// TODO: substituir a lista em memória por SQLite (offline-first) + sync
-/// com Supabase, seguindo o mesmo padrão já usado no restante do app.
+ClienteLocal _fromRust(rust.Cliente c) {
+  return ClienteLocal(
+    id: c.id.toInt(),
+    nome: c.nome,
+    cadastro: c.cadastro,
+    telefone: c.telefone,
+    endereco: EnderecoLocal(
+      cep: c.endereco.cep,
+      logradouro: c.endereco.logradouro,
+      numero: c.endereco.numero,
+      complemento: c.endereco.complemento,
+      bairro: c.endereco.bairro,
+      municipio: c.endereco.municipio,
+      uf: c.endereco.uf,
+    ),
+  );
+}
+
+rust.Cliente _toRust(ClienteLocal c) {
+  return rust.Cliente(
+    id: c.id,
+    nome: c.nome,
+    cadastro: c.cadastro,
+    telefone: c.telefone,
+    endereco: rust.Endereco(
+      cep: c.endereco.cep,
+      logradouro: c.endereco.logradouro,
+      numero: c.endereco.numero,
+      complemento: c.endereco.complemento,
+      bairro: c.endereco.bairro,
+      municipio: c.endereco.municipio,
+      uf: c.endereco.uf,
+    ),
+  );
+}
+
 class ClientesController extends ChangeNotifier {
-  final List<Cliente> _clientes = [
-    const Cliente(
-      id: '1',
-      nome: 'Maria Auxiliadora',
-      cadastro: '111.222.333-44',
-      telefone: '(85) 98822-4455',
-      cep: '63000-000',
-      logradouro: 'Rua das Acácias',
-      numero: '120',
-      bairro: 'Centro',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
-      status: ClienteStatus.ativo,
-    ),
-    const Cliente(
-      id: '2',
-      nome: 'João Paulo Silva',
-      cadastro: '222.333.444-55',
-      telefone: '(85) 99744-1122',
-      cep: '63010-000',
-      logradouro: 'Av. Padre Cícero',
-      numero: '850',
-      complemento: 'Apto 302',
-      bairro: 'São Miguel',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
-      status: ClienteStatus.pendente,
-    ),
-    const Cliente(
-      id: '3',
-      nome: 'Ricardo Lemos',
-      cadastro: '333.444.555-66',
-      telefone: '(85) 98122-3344',
-      cep: '63020-000',
-      logradouro: 'Rua José de Alencar',
-      numero: '45',
-      bairro: 'Franciscanos',
-      municipio: 'Juazeiro do Norte',
-      uf: 'CE',
-      status: ClienteStatus.ativo,
-    ),
-  ];
+  List<ClienteLocal> _clientes = [];
+  bool _carregando = false;
+  String _erro = '';
 
-  String _searchQuery = '';
-  String get searchQuery => _searchQuery;
+  bool get carregando => _carregando;
+  String get erro => _erro;
 
-  // TODO: buscar valores reais (total de ativos e novos da semana) do banco.
+  String _busca = '';
+  String get busca => _busca;
+
   int get totalAtivos =>
       _clientes.where((c) => c.status == ClienteStatus.ativo).length;
-  final int newThisWeek = 5;
+  final int novosEstaSemana = 0;
 
-  List<Cliente> get clientes {
-    if (_searchQuery.trim().isEmpty) return List.unmodifiable(_clientes);
-    final query = _searchQuery.trim().toLowerCase();
+  List<ClienteLocal> get clientes {
+    if (_busca.trim().isEmpty) return List.unmodifiable(_clientes);
+    final termo = _busca.trim().toLowerCase();
     return _clientes
-        .where((c) => c.nome.toLowerCase().contains(query))
+        .where((c) => c.nome.toLowerCase().contains(termo))
         .toList(growable: false);
   }
 
-  void updateSearch(String query) {
-    _searchQuery = query;
+  void atualizarBusca(String termo) {
+    _busca = termo;
     notifyListeners();
   }
 
-  Future<void> addCliente(Cliente cliente) async {
-    _clientes.insert(0, cliente);
+  Future<void> carregarClientes() async {
+    _carregando = true;
+    _erro = '';
     notifyListeners();
 
     try {
-      await incluir_cliente_service(
-        cliente: Cliente(
-          nome: cliente.nome,
-          cadastro: cliente.cadastro,
-          telefone: cliente.telefone,
-          endereco: Endereco(
-            cep: cliente.cep,
-            logradouro: cliente.logradouro,
-            numero: cliente.numero,
-            complemento: cliente.complemento,
-            bairro: cliente.bairro,
-            municipio: cliente.municipio,
-            uf: cliente.uf,
-          ),
-        ),
-      );
-    } catch (erro) {
-      _clientes.removeWhere((c) => c.cadastro == cliente.cadastro);
+      final clientesRust = await rust.listarClientes();
+      _clientes = clientesRust.map(_fromRust).toList();
+    } catch (e) {
+      _erro = _extrairMensagemErro(e);
+    } finally {
+      _carregando = false;
       notifyListeners();
-
-      debugPrint('Erro ao persistir cliente no Rust: $erro');
-      rethrow;
     }
   }
 
-  void updateCliente(Cliente cliente) {
-    final index = _clientes.indexWhere((c) => c.id == cliente.id);
-    if (index == -1) return;
-    _clientes[index] = cliente;
-    notifyListeners();
+  // Método auxiliar para formatar os erros vindos do Rust
+  String _extrairMensagemErro(Object e) {
+    return rust.extrairMensagemErro(e);
+  }
+  Future<void> adicionarCliente(ClienteLocal cliente) async {
+    try {
+      await rust.incluirCliente(cliente: _toRust(cliente));
+      await carregarClientes();
+    } catch (e) {
+      _erro = _extrairMensagemErro(e);
+      notifyListeners();
+    }
   }
 
-  void deleteCliente(String id) {
-    _clientes.removeWhere((c) => c.id == id);
-    notifyListeners();
+  Future<void> atualizarCliente(ClienteLocal cliente) async {
+    try {
+      await rust.atualizarCliente(
+        cliente: _toRust(cliente),
+        clienteId: cliente.id,
+      );
+      await carregarClientes();
+    } catch (e) {
+      _erro = _extrairMensagemErro(e);
+      notifyListeners();
+    }
+  }
+
+  Future<void> excluirCliente(ClienteLocal cliente) async {
+    try {
+      await rust.excluirCliente(
+        cliente: _toRust(cliente),
+        clienteId: cliente.id,
+      );
+      await carregarClientes();
+    } catch (e) {
+      _erro = _extrairMensagemErro(e);
+      notifyListeners();
+    }
   }
 }

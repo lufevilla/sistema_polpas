@@ -12,15 +12,15 @@ import 'sales_controller.dart';
 /// continuam definidos só no shell principal
 /// (lib/features/bottomNavigationBar/bottom_navigation_page.dart) e não
 /// foram alterados aqui.
-class salesPage extends StatefulWidget {
-  const salesPage({super.key});
+class SalesPage extends StatefulWidget {
+  const SalesPage({super.key});
 
   @override
-  State<salesPage> createState() => _salesPageState();
+  State<SalesPage> createState() => _SalesPageState();
 }
 
-class _salesPageState extends State<salesPage> {
-  final salesController _controller = salesController();
+class _SalesPageState extends State<SalesPage> {
+  final SalesController _controller = SalesController();
 
   @override
   void initState() {
@@ -77,7 +77,7 @@ class _salesPageState extends State<salesPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    salesSearchBar(
+                    SalesSearchBar(
                       onChanged: _controller.updateSearch,
                       onFilterTap: () {
                         // TODO: implementar filtros reais (status, período, etc).
