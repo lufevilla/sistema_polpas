@@ -31,17 +31,20 @@ pub fn create_database () -> Result<Connection, AppError> {
         CREATE TABLE IF NOT EXISTS itens_pedido (
             id_item INTEGER PRIMARY KEY AUTOINCREMENT,
             pedido_id INTEGER NOT NULL,          
-            produto_nome TEXT NOT NULL,
+            produto_id INTEGER NOT NULL,
             quantidade INTEGER NOT NULL,
             valor REAL NOT NULL,
             subtotal REAL NOT NULL, 
-            FOREIGN KEY (pedido_id) REFERENCES pedidos(id_pedidos) ON DELETE CASCADE -- esta função serve para deletar todos os itens do DB,caso o pedido seja excluido 
+            FOREIGN KEY (pedido_id) REFERENCES pedidos(id_pedidos) ON DELETE CASCADE
+            FOREIGN KEY (produto_id) REFERENCES estoque(id_merc)
         );
             
         CREATE TABLE IF NOT EXISTS estoque(
             id_merc INTEGER PRIMARY KEY AUTOINCREMENT,
             nome_merc TEXT UNIQUE NOT NULL,
-            quantidade_est INTEGER NOT NULL
+            quantidade_est INTEGER NOT NULL,
+            quantidade_minima INTEGER NOT NULL,
+            valor_unitario REAL NOT NULL
         );
         
     ").unwrap();
