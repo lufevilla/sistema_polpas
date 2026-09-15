@@ -14,4 +14,10 @@ pub enum AppError {
     // Converte erros do rusqlite automaticamente em um variante do enum
     #[error("Erro interno no banco de dados: {0}")]
     Database(#[from] rusqlite::Error),
+
+    #[error("Saldo no estoque insuficiente!")]
+    EstoqueInsuficiente, 
+
+    #[error("O item já está cadastrado no estoque")]
+    MercadoriaJaExiste,
 }

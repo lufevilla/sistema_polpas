@@ -1,88 +1,56 @@
-// use rusqlite::Connection;
+use crate::error::AppError;
+use crate::models::pedido::*;
+use crate::banco_de_dados::database_est::*;
 
+pub async fn incluir_item_estoque(produto: Produto) -> Result<(), AppError>{
 
-// use crate::models::pedido::*;
-// use crate::banco_de_dados::database_est::*;
-
-// pub fn entrada_no_estoque (conn_db: &Connection) {
-
-//     let mut produto: Produto = Produto::default();
-
-//     limpar();
-//     println!("Vamos registrar a entrada de mercadorias no estoque \nPrimeiro digite o id do item");
-//     produto.id_merc = leitura_dados();
-//     println!("Agora insira a quantidade que deseja adicionar ao estoque atual");
-//     produto.quantidade_est = leitura_dados();
+    checagem_presenca_dados(&produto)?; 
+    match pesquisa_mercadoria_db(&produto.nome_merc){
+        Ok(true) => {
+            return incluir_merc_est_db(produto);
+        }
+        Ok(false) => {
+            return Err(AppError::MercadoriaJaExiste);
+        }
+        Err(e) =>{
+            return Err(e);
+        }
+    }
     
-//     if let Ok(()) = entrada_estoque_db(conn_db, &produto){
-//         println!("Estoque ataulizado com sucesso");
-//     } else {
-//         println!("Erro ao atualizar o Estoque");
-        
-//     }
+}
 
-// }
+pub async fn entrada_no_estoque (id_merc: i64, quantidade_a_adicionar: i64) -> Result<(), AppError> {
+    entrada_est_db(id_merc, quantidade_a_adicionar);
+    Ok(())
+}
 
-// pub fn listagem_do_estoque(conn_db: &Connection) {
+pub async fn listagem_do_estoque() -> Result<Vec<Produto>, AppError>{
+    let vec_estoque = listagem_estoque_db()?;
+    Ok(vec_estoque)
+}
 
-//     limpar();
-//     println!("**** Estoque ****");
-//     if let Ok(vec_produto ) = listagem_estoque_db(conn_db) {
-//         for produto in vec_produto.iter() {
-//             println!("id: {} | produto: {} | quantidade: {}",
-//                     produto.id_merc ,produto.nome_merc ,produto.quantidade_est);
-//         }
-//     }else {
-//         println!("Erro ao consultar o Estoque no banco de dados");
-//     }
-// }
+pub async fn saida_estoque(quantidade_saida: i64, id_merc: i64) -> Result<(),AppError>{
 
-// pub fn incluir_item(conn_db: &Connection){
+    saida_est_db(quantidade_saida, id_merc)?;
+    Ok(())
+}
 
-//     loop {
-//         limpar();
-//         println!("Insira o nome do item que deseja adicionar");
-//         let nome_merc = leitura();
-//         println!("Agora adicione a quantidade incial do produto no estoque");
-//         let quantidade_est = leitura_dados();
-//         println!("As informações estão corretas??\n (Sim/nao)");
-//         let opcao: String = leitura();
-//         if opcao.trim().eq_ignore_ascii_case("sim"){
-//             if let Ok(()) = incluir_item_estoque_db(conn_db,nome_merc, quantidade_est){
-//                 println!("Novo item cadastrado com sucesso!");
-//                 break;
-//             }
-//         }else{
-//             println!("reiniciando...");
-//             pausar(2);
-//         }
+pub async fn excluir_item(id_merc: i64) -> Result<(), AppError> {
+    excluir_produto_est_db(id_merc);
+    Ok(())
+}
 
-//     }
-    
-// }
+fn checagem_presenca_dados(produto: &Produto) -> Result<(), AppError>{
+        let campos_obrigatorios = [
+        ("Nome da Mercadoria".to_string(), produto.nome_merc.clone()),
+        ("Quantidade Presente".to_string(),produto.quantidade_est.to_string()),
+        ("Quantidade Minima de estoque".to_string(), produto.quantidade_minima.to_string()),
+        ("Valor unitário do produto".to_string(), produto.valor_unitario.to_string()),
+    ];
+    if let Some((nome_campo, _)) = campos_obrigatorios.iter().find(|(_, val)| val.trim().is_empty()) {
+        return Err(AppError::DadosNaoInseridos(nome_campo.to_string()));
+    } else {
+        return Ok(());
+    }
 
-// pub fn excluir_item(conn_db: &Connection) {
-
-//     limpar();
-//     println!("insira o ID do item que deseja excluir");
-//     let item_id: usize = leitura_dados();
-//     println!("você tem certeza ???\n(Sim/nao)");
-//     let opcao: String = leitura();
-//     if opcao.trim().eq_ignore_ascii_case("sim"){
-//         limpar();
-//         println!("excluindo item...");
-//         if let Ok(()) = excluir_item_estoque_db(conn_db, item_id){
-//                 println!("Item excluido com sucesso!");
-//                 pausar(2);
-//                 return;
-//         }else{
-//                     println!("Não foi possivel excluir o item solicitado");
-//                 pausar(2);
-//                 return;
-//         }
-//     }else{ 
-//         limpar();
-//         println!("cancelando a exclusão...");
-//         pausar(2);
-//     }
-// }
+}

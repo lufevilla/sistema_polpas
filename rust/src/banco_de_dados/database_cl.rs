@@ -6,7 +6,7 @@ use crate::create_db::obter_conexao;
 
 // todas as funções serão praticamente identica com a unica diferença sendo a função do sqlite e suas clausulas presentes  em cada uma delas 
 
-pub fn incluir_cliente_db( cliente: &Cliente) -> Result<(), AppError> { 
+pub fn incluir_cliente_db( cliente: Cliente) -> Result<(), AppError> { 
         let conn_db = obter_conexao();
         conn_db?.execute(
         "INSERT INTO clientes (nome, cadastro, telefone, cep, logradouro, numero, complemento, bairro, municipio, uf)
@@ -71,7 +71,7 @@ pub fn pesquisa_cliente_db(nome_cliente: &String, cadastro_cliente: &String) -> 
 
     let conn_db = obter_conexao()?;
     let existe: bool = conn_db.query_row(
-        "SELECT EXISTS(SELECT 1 FROM usuarios WHERE nome = ? AND cadastro = ?)",
+        "SELECT EXISTS(SELECT 1 FROM usuarios WHERE nome = ?1 AND cadastro = ?2)",
         [nome_cliente,cadastro_cliente],
 
         |row| row.get(0),// o DB retorna um true ou false se ele achar algo

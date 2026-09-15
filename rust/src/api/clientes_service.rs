@@ -1,5 +1,3 @@
-use rusqlite::Error;
-
 use crate::{models::cliente::Cliente, banco_de_dados::database_cl::*, error::AppError};
 
 pub async fn incluir_cliente_service(cliente: Cliente) -> Result<(), AppError>{
@@ -8,7 +6,7 @@ pub async fn incluir_cliente_service(cliente: Cliente) -> Result<(), AppError>{
 
     match pesquisa_cliente_db(&cliente.nome,&cliente.cadastro){
         Ok(true) => {
-            return incluir_cliente_db(&cliente);
+            return incluir_cliente_db(cliente);
         } 
         Ok(false) => {
             return Err(AppError::ClienteJaExiste);
@@ -26,7 +24,7 @@ pub async fn atualizar_cliente_service(cliente: Cliente, cliente_id: i64) -> Res
     atualizar_cliente_db(&cliente, cliente_id)
 }
 
-pub async fn excluir_cliente_service(cliente: Cliente,cliente_id: i64) -> Result<(), AppError>{
+pub async fn excluir_cliente_service(cliente_id: i64) -> Result<(), AppError>{
 
     excluir_cliente_db(cliente_id)
 }
