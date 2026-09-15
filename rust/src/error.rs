@@ -15,3 +15,10 @@ pub enum AppError {
     #[error("Erro interno no banco de dados: {0}")]
     Database(#[from] rusqlite::Error),
 }
+
+#[flutter_rust_bridge::frb]
+impl AppError {
+    pub fn mensagem(&self) -> String {
+        self.to_string()
+    }
+}

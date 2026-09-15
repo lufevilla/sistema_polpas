@@ -159,19 +159,23 @@ class ClientesController extends ChangeNotifier {
       final clientesRust = await rust.listarClientes();
       _clientes = clientesRust.map(_fromRust).toList();
     } catch (e) {
-      _erro = e.toString();
+      _erro = _extrairMensagemErro(e);
     } finally {
       _carregando = false;
       notifyListeners();
     }
   }
 
+  // Método auxiliar para formatar os erros vindos do Rust
+  String _extrairMensagemErro(Object e) {
+    return rust.extrairMensagemErro(e);
+  }
   Future<void> adicionarCliente(ClienteLocal cliente) async {
     try {
       await rust.incluirCliente(cliente: _toRust(cliente));
       await carregarClientes();
     } catch (e) {
-      _erro = e.toString();
+      _erro = _extrairMensagemErro(e);
       notifyListeners();
     }
   }
@@ -184,7 +188,7 @@ class ClientesController extends ChangeNotifier {
       );
       await carregarClientes();
     } catch (e) {
-      _erro = e.toString();
+      _erro = _extrairMensagemErro(e);
       notifyListeners();
     }
   }
@@ -197,7 +201,7 @@ class ClientesController extends ChangeNotifier {
       );
       await carregarClientes();
     } catch (e) {
-      _erro = e.toString();
+      _erro = _extrairMensagemErro(e);
       notifyListeners();
     }
   }

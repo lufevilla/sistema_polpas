@@ -1,4 +1,6 @@
 import '../src/rust/api/clientes_service.dart';
+import '../src/rust/api/simple.dart' as api;
+import '../src/rust/error.dart';
 import '../src/rust/models/cliente.dart';
 
 export '../src/rust/models/cliente.dart' show Cliente, Endereco;
@@ -23,4 +25,11 @@ Future<void> excluirCliente({
 
 Future<List<Cliente>> listarClientes() {
   return listarClientesService();
+}
+
+String extrairMensagemErro(Object e) {
+  if (e is AppError) {
+    return api.extrairMensagemErro(erro: e);
+  }
+  return e.toString();
 }
