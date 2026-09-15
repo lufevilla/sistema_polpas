@@ -149,14 +149,14 @@ fn wire__crate__api__clientes_service__excluir_cliente_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_cliente = <crate::models::cliente::Cliente>::sse_decode(&mut deserializer);
+            let api__cliente = <crate::models::cliente::Cliente>::sse_decode(&mut deserializer);
             let api_cliente_id = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
                         let output_ok = crate::api::clientes_service::excluir_cliente_service(
-                            api_cliente,
+                            api__cliente,
                             api_cliente_id,
                         )
                         .await?;
@@ -190,13 +190,13 @@ fn wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_item_id = <i64>::sse_decode(&mut deserializer);
+            let api__item_id = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
                         let output_ok =
-                            crate::api::estoque_service::excluir_item_estoque_service(api_item_id)
+                            crate::api::estoque_service::excluir_item_estoque_service(api__item_id)
                                 .await?;
                         std::result::Result::Ok(output_ok)
                     })()

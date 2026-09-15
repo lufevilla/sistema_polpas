@@ -24,7 +24,7 @@ class StockTotalCard extends StatelessWidget {
             child: Icon(
               Icons.inventory_2,
               size: 120,
-              color: AppColors.gold.withOpacity(0.15),
+              color: AppColors.gold.withValues(alpha: 0.15),
             ),
           ),
           Column(

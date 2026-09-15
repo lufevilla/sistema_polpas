@@ -97,7 +97,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
 
   late int? _clienteId = widget.pedido?.clienteId;
   late DateTime _data = widget.pedido?.data ?? DateTime.now();
-  late salestatus _status = widget.pedido?.status ?? salestatus.pendente;
+  late SaleStatus _status = widget.pedido?.status ?? SaleStatus.pendente;
 
   late final List<_ItemDraft> _itens = widget.itensIniciais.isNotEmpty
       ? widget.itensIniciais
@@ -353,12 +353,12 @@ class _VendaFormModalState extends State<_VendaFormModal> {
   }
 
   Widget _statusField() {
-    return DropdownButtonFormField<salestatus>(
+    return DropdownButtonFormField<SaleStatus>(
       initialValue: _status,
       items: const [
-        DropdownMenuItem(value: salestatus.pendente, child: Text('Pendente')),
-        DropdownMenuItem(value: salestatus.pago, child: Text('Pago')),
-        DropdownMenuItem(value: salestatus.entregue, child: Text('Entregue')),
+        DropdownMenuItem(value: SaleStatus.pendente, child: Text('Pendente')),
+        DropdownMenuItem(value: SaleStatus.pago, child: Text('Pago')),
+        DropdownMenuItem(value: SaleStatus.entregue, child: Text('Entregue')),
       ],
       onChanged: _isEditable
           ? (value) => setState(() => _status = value!)

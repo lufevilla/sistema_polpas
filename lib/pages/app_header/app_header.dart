@@ -51,7 +51,7 @@ class AppHeader extends StatelessWidget {
               storeInfo.subtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
               ),
             ),

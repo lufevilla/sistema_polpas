@@ -49,7 +49,7 @@ class StockItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _isCritical
-              ? AppColors.danger.withOpacity(0.3)
+              ? AppColors.danger.withValues(alpha: 0.3)
               : AppColors.border,
         ),
         boxShadow: const [
@@ -173,7 +173,7 @@ class StockItemCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground.withOpacity(0.6),
+        color: AppColors.cardBackground.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
@@ -266,7 +266,7 @@ class StockItemCard extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.headerStart,
                     side: BorderSide(
-                      color: AppColors.headerStart.withOpacity(0.3),
+                      color: AppColors.headerStart.withValues(alpha: 0.3),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
@@ -297,8 +297,8 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final background = isCritical
-        ? AppColors.danger.withOpacity(0.12)
-        : color.withOpacity(0.12);
+        ? AppColors.danger.withValues(alpha: 0.12)
+        : color.withValues(alpha: 0.12);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
