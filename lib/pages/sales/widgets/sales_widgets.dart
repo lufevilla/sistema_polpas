@@ -4,11 +4,11 @@ import 'package:sistema_polpas/pages/sales/sales_controller.dart';
 
 /// Linha com a caixa de busca por cliente (ícone de lupa à esquerda) e um
 /// botão quadrado de filtro ao lado, igual ao print.
-class salesSearchBar extends StatelessWidget {
+class SalesSearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final VoidCallback? onFilterTap;
 
-  const salesSearchBar({super.key, required this.onChanged, this.onFilterTap});
+  const SalesSearchBar({super.key, required this.onChanged, this.onFilterTap});
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +62,10 @@ class salesSearchBar extends StatelessWidget {
 }
 
 /// Selo de status da venda ("Entregue" / "Pago" / "Pendente").
-class salestatusBadge extends StatelessWidget {
-  final salestatus status;
+class SaleStatusBadge extends StatelessWidget {
+  final SaleStatus status;
 
-  const salestatusBadge({super.key, required this.status});
+  const SaleStatusBadge({super.key, required this.status});
   @override
   Widget build(BuildContext context) {
     late final Color bg;
@@ -73,17 +73,17 @@ class salestatusBadge extends StatelessWidget {
     late final String label;
 
     switch (status) {
-      case salestatus.entregue:
+      case SaleStatus.entregue:
         bg = const Color(0xFFF3E3DF);
         fg = AppColors.headerStart;
         label = 'Entregue';
         break;
-      case salestatus.pago:
+      case SaleStatus.pago:
         bg = const Color(0xFFDFF3E1);
         fg = AppColors.success;
         label = 'Pago';
         break;
-      case salestatus.pendente:
+      case SaleStatus.pendente:
         bg = const Color(0xFFFBE7CC);
         fg = AppColors.goldDark;
         label = 'Pendente';
@@ -153,7 +153,7 @@ class VendaListTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  salestatusBadge(status: pedido.status),
+                  SaleStatusBadge(status: pedido.status),
                 ],
               ),
               const SizedBox(height: 6),

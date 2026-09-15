@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// print — a regra real (ex: baseada em pagamento/entrega/nota fiscal)
 /// deve substituir isso depois, possivelmente como uma coluna própria
 /// ou derivada de outra tabela (ex: pagamentos, entregas).
-enum salestatus { entregue, pago, pendente }
+enum SaleStatus { entregue, pago, pendente }
 
 /// Referência simples de cliente (id + nome), usada só pra popular o
 /// seletor de cliente no formulário de venda e exibir o nome no card.
@@ -26,21 +26,21 @@ class Pedido {
   final int clienteId;
   final DateTime data;
   final double valorTotal;
-  final salestatus status; // TODO: não existe no schema, ver enum acima.
+  final SaleStatus status; // TODO: não existe no schema, ver enum acima.
 
   const Pedido({
     required this.idPedido,
     required this.clienteId,
     required this.data,
     required this.valorTotal,
-    this.status = salestatus.pendente,
+    this.status = SaleStatus.pendente,
   });
 
   Pedido copyWith({
     int? clienteId,
     DateTime? data,
     double? valorTotal,
-    salestatus? status,
+    SaleStatus? status,
   }) {
     return Pedido(
       idPedido: idPedido,
@@ -81,7 +81,7 @@ class ItemPedido {
 /// pedido, replicar o comportamento do `ON DELETE CASCADE` do schema
 /// (os itens_pedido do pedido também são removidos — já feito aqui em
 /// memória por deletePedido).
-class salesController extends ChangeNotifier {
+class SalesController extends ChangeNotifier {
   // TODO: substituir pela lista real de clients (ver ClientesController).
   final List<ClienteResumo> clientesDisponiveis = const [
     ClienteResumo(id: 1, nome: 'Maria Fernanda Castro'),
@@ -96,28 +96,28 @@ class salesController extends ChangeNotifier {
       clienteId: 1,
       data: DateTime(2023, 10, 12),
       valorTotal: 148.00,
-      status: salestatus.entregue,
+      status: SaleStatus.entregue,
     ),
     Pedido(
       idPedido: 2,
       clienteId: 2,
       data: DateTime(2023, 10, 11),
       valorTotal: 280.50,
-      status: salestatus.pago,
+      status: SaleStatus.pago,
     ),
     Pedido(
       idPedido: 3,
       clienteId: 3,
       data: DateTime(2023, 10, 10),
       valorTotal: 540.00,
-      status: salestatus.pendente,
+      status: SaleStatus.pendente,
     ),
     Pedido(
       idPedido: 4,
       clienteId: 4,
       data: DateTime(2023, 10, 8),
       valorTotal: 130.00,
-      status: salestatus.entregue,
+      status: SaleStatus.entregue,
     ),
   ];
 

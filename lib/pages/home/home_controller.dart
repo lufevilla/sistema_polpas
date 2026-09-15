@@ -70,7 +70,7 @@ class HomeController extends ChangeNotifier {
   void onsalesTap(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => salesPage()),
+      MaterialPageRoute(builder: (context) => SalesPage()),
     );
   }
 
