@@ -4,13 +4,6 @@ import 'package:sistema_polpas/pages/clients/widgets/clientes_widgets.dart';
 import '../../core/theme/app_colors.dart';
 import 'clients_controller.dart';
 
-/// Aba "Clientes".
-///
-/// Importante: assim como as demais abas, esta página NÃO tem Scaffold,
-/// AppHeader nem bottom navigation próprios — o header e a bottom nav
-/// continuam definidos só no shell principal
-/// (lib/features/bottomNavigationBar/bottom_navigation_page.dart) e não
-/// foram alterados aqui.
 class ClientesPage extends StatefulWidget {
   const ClientesPage({super.key});
 
@@ -24,27 +17,31 @@ class _ClientesPageState extends State<ClientesPage> {
   @override
   void initState() {
     super.initState();
-    _controller.addListener(_onControllerChanged);
+    _controller.addListener(_aoControladorMudar);
+    _controller.carregarClientes();
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onControllerChanged);
+    _controller.removeListener(_aoControladorMudar);
     super.dispose();
   }
 
-  void _onControllerChanged() => setState(() {});
+  void _aoControladorMudar() => setState(() {});
 
-  void _openAddClienteModal() {
-    showAddClienteModal(context: context, onSave: _controller.addCliente);
+  void _abrirModalNovoCliente() {
+    mostrarModalNovoCliente(
+      context: context,
+      aoSalvar: _controller.adicionarCliente,
+    );
   }
 
-  void _openClienteDetailsModal(Cliente cliente) {
-    showClienteDetailsModal(
+  void _abrirModalDetalhesCliente(ClienteLocal cliente) {
+    mostrarModalDetalhesCliente(
       context: context,
       cliente: cliente,
-      onSave: _controller.updateCliente,
-      onDelete: _controller.deleteCliente,
+      aoSalvar: _controller.atualizarCliente,
+      aoExcluir: _controller.excluirCliente,
     );
   }
 
@@ -65,45 +62,72 @@ class _ClientesPageState extends State<ClientesPage> {
           bottom: false,
           child: Stack(
             children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // No lugar do card "Base de Clientes" do print original.
-                    ClientesSearchBar(onChanged: _controller.updateSearch),
-                    const SizedBox(height: 16),
-                    // No lugar do quadrado amarelo de fidelidade Premium.
-                    ClientesStatsCard(
-                      totalAtivos: _controller.totalAtivos,
-                      novosEstaSemana: _controller.newThisWeek,
-                    ),
-                    const SizedBox(height: 20),
-                    if (clientes.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 40),
-                        child: Center(
-                          child: Text(
-                            'Nenhum cliente encontrado.',
-                            style: TextStyle(color: AppColors.textMuted),
-                          ),
+              if (_controller.carregando)
+                const Center(child: CircularProgressIndicator())
+              else if (_controller.erro.isNotEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Erro ao carregar clientes',
+                          style: TextStyle(color: AppColors.danger),
                         ),
-                      )
-                    else
-                      for (final cliente in clientes) ...[
-                        ClienteListTile(
-                          cliente: cliente,
-                          onTap: () => _openClienteDetailsModal(cliente),
+                        const SizedBox(height: 8),
+                        Text(
+                          _controller.erro,
+                          style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: _controller.carregarClientes,
+                          child: const Text('Tentar novamente'),
+                        ),
                       ],
-                  ],
+                    ),
+                  ),
+                )
+              else
+                SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ClientesSearchBar(onChanged: _controller.atualizarBusca),
+                      const SizedBox(height: 16),
+                      ClientesStatsCard(
+                        totalAtivos: _controller.totalAtivos,
+                        novosEstaSemana: _controller.novosEstaSemana,
+                      ),
+                      const SizedBox(height: 20),
+                      if (clientes.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 40),
+                          child: Center(
+                            child: Text(
+                              'Nenhum cliente encontrado.',
+                              style: TextStyle(color: AppColors.textMuted),
+                            ),
+                          ),
+                        )
+                      else
+                        for (final cliente in clientes) ...[
+                          ClienteListTile(
+                            cliente: cliente,
+                            aoTocar: () => _abrirModalDetalhesCliente(cliente),
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+                    ],
+                  ),
                 ),
-              ),
               Positioned(
                 right: 20,
                 bottom: 24,
-                child: AddClienteButton(onTap: _openAddClienteModal),
+                child: BotaoAdicionarCliente(aoTocar: _abrirModalNovoCliente),
               ),
             ],
           ),

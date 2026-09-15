@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sistema_polpas/core/theme/app_colors.dart';
 import 'package:sistema_polpas/pages/clients/clients_controller.dart';
 
-/// Caixa de pesquisa retangular com borda visível e ícone de lupa na
-/// extrema direita, no lugar do card "Base de Clientes" do print original.
 class ClientesSearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
@@ -21,7 +19,7 @@ class ClientesSearchBar extends StatelessWidget {
         onChanged: onChanged,
         style: const TextStyle(color: AppColors.textDark, fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Pesquisar clients...',
+          hintText: 'Pesquisar clientes...',
           hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -35,8 +33,6 @@ class ClientesSearchBar extends StatelessWidget {
   }
 }
 
-/// Card branco "Base de Clientes" com o total de ativos e novos da semana,
-/// no lugar do card amarelo de fidelidade Premium do print original.
 class ClientesStatsCard extends StatelessWidget {
   final int totalAtivos;
   final int novosEstaSemana;
@@ -93,7 +89,6 @@ class ClientesStatsCard extends StatelessWidget {
   }
 }
 
-/// Selo de status ("Ativo" / "Pendente").
 class ClienteStatusBadge extends StatelessWidget {
   final ClienteStatus status;
 
@@ -101,35 +96,33 @@ class ClienteStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAtivo = status == ClienteStatus.ativo;
-    final bg = isAtivo ? const Color(0xFFDFF3E1) : const Color(0xFFFBE7CC);
-    final fg = isAtivo ? AppColors.success : AppColors.goldDark;
-    final label = isAtivo ? 'Ativo' : 'Pendente';
+    final ehAtivo = status == ClienteStatus.ativo;
+    final fundo = ehAtivo ? const Color(0xFFDFF3E1) : const Color(0xFFFBE7CC);
+    final frente = ehAtivo ? AppColors.success : AppColors.goldDark;
+    final rotulo = ehAtivo ? 'Ativo' : 'Pendente';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bg,
+        color: fundo,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        label,
-        style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700),
+        rotulo,
+        style: TextStyle(color: frente, fontSize: 12, fontWeight: FontWeight.w700),
       ),
     );
   }
 }
 
-/// Linha de cliente na listagem: avatar com iniciais, nome, telefone,
-/// selo de status e seta indicando que é clicável.
 class ClienteListTile extends StatelessWidget {
-  final Cliente cliente;
-  final VoidCallback onTap;
+  final ClienteLocal cliente;
+  final VoidCallback aoTocar;
 
   const ClienteListTile({
     super.key,
     required this.cliente,
-    required this.onTap,
+    required this.aoTocar,
   });
 
   @override
@@ -139,7 +132,7 @@ class ClienteListTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
+        onTap: aoTocar,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -196,12 +189,10 @@ class ClienteListTile extends StatelessWidget {
   }
 }
 
-/// Botão flutuante "+" (mesmo tom de dourado usado no resto do app) para
-/// abrir o modal de cadastro de novo cliente.
-class AddClienteButton extends StatelessWidget {
-  final VoidCallback onTap;
+class BotaoAdicionarCliente extends StatelessWidget {
+  final VoidCallback aoTocar;
 
-  const AddClienteButton({super.key, required this.onTap});
+  const BotaoAdicionarCliente({super.key, required this.aoTocar});
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +202,7 @@ class AddClienteButton extends StatelessWidget {
       elevation: 4,
       child: InkWell(
         customBorder: const CircleBorder(),
-        onTap: onTap,
+        onTap: aoTocar,
         child: const SizedBox(
           width: 56,
           height: 56,
