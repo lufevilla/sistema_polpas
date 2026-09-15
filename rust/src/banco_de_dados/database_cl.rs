@@ -33,12 +33,13 @@ pub fn atualizar_cliente_db( cliente: &Cliente, cliente_id: i64) -> Result<(), A
     let conn_db = obter_conexao()?;
     conn_db.execute(
         "UPDATE clientes
-         SET nome = ?1, cadastro = ?2, cep = ?3, logradouro = ?4, 
-             numero = ?5, complemento = ?6, bairro = ?7, municipio = ?8, uf = ?9 
-         WHERE id = ?10",
+         SET nome = ?1, cadastro = ?2, telefone = ?3, cep = ?4, logradouro = ?5, 
+             numero = ?6, complemento = ?7, bairro = ?8, municipio = ?9, uf = ?10 
+         WHERE id = ?11",
         (
             &cliente.nome,
             &cliente.cadastro,
+            &cliente.telefone,
             &cliente.endereco.cep,
             &cliente.endereco.logradouro,
             &cliente.endereco.numero,
@@ -71,7 +72,7 @@ pub fn pesquisa_cliente_db(nome_cliente: &String, cadastro_cliente: &String) -> 
 
     let conn_db = obter_conexao()?;
     let existe: bool = conn_db.query_row(
-        "SELECT EXISTS(SELECT 1 FROM usuarios WHERE nome = ? AND cadastro = ?)",
+        "SELECT EXISTS(SELECT 1 FROM clientes WHERE nome = ? AND cadastro = ?)",
         [nome_cliente,cadastro_cliente],
 
         |row| row.get(0),// o DB retorna um true ou false se ele achar algo

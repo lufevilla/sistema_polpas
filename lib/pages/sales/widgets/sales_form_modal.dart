@@ -384,6 +384,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                 child: TextFormField(
                   controller: item.produtoNome,
                   enabled: _isEditable,
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Produto', dense: true),
                   validator: (value) => (value == null || value.trim().isEmpty)
@@ -410,6 +411,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                   controller: item.quantidade,
                   enabled: _isEditable,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Qtd.', dense: true),
                   validator: (value) {
@@ -427,6 +429,7 @@ class _VendaFormModalState extends State<_VendaFormModal> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  textInputAction: TextInputAction.done,
                   style: const TextStyle(fontSize: 14),
                   decoration: _decoration('Valor unit.', dense: true),
                   validator: (value) {

@@ -107,18 +107,20 @@ class _StockPageState extends State<StockPage> {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 2,
-              child: StockTotalCard(total: _controller.totalStock),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StockLowStockCard(count: _controller.lowStockCount),
-            ),
-          ],
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 2,
+                child: StockTotalCard(total: _controller.totalStock),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: StockLowStockCard(count: _controller.lowStockCount),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         StockBestsellerCard(name: _controller.bestSellerName),

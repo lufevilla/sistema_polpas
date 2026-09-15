@@ -236,7 +236,11 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
                       const SizedBox(width: 12),
                       Expanded(
                         flex: 1,
-                        child: _campo(controlador: _uf, label: 'UF'),
+                        child: _campo(
+                          controlador: _uf,
+                          label: 'UF',
+                          acaoTeclado: TextInputAction.done,
+                        ),
                       ),
                     ],
                   ),
@@ -256,6 +260,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
     required String label,
     TextInputType tipoTeclado = TextInputType.text,
     bool obrigatorio = true,
+    TextInputAction acaoTeclado = TextInputAction.next,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -263,6 +268,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
         controller: controlador,
         enabled: _ehEditavel,
         keyboardType: tipoTeclado,
+        textInputAction: acaoTeclado,
         style: const TextStyle(color: AppColors.textDark, fontSize: 14),
         validator: (value) {
           if (!obrigatorio) return null;
