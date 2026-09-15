@@ -18,7 +18,7 @@ pub async fn atualizar_cliente_service(cliente: Cliente, cliente_id: i64) -> Res
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn excluir_cliente_service(cliente: Cliente, cliente_id: i64) -> Result<(), AppError> {
+pub async fn excluir_cliente_service(_cliente: Cliente, cliente_id: i64) -> Result<(), AppError> {
     excluir_cliente_db(cliente_id)
 }
 

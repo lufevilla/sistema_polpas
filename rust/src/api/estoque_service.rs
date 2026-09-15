@@ -30,8 +30,8 @@ pub async fn incluir_item_estoque_service(nome_merc: String, quantidade_est: i64
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn excluir_item_estoque_service(item_id: i64) -> Result<(), AppError> {
-    let conn_db = crate::banco_de_dados::create_db::obter_conexao()?;
+pub async fn excluir_item_estoque_service(_item_id: i64) -> Result<(), AppError> {
+    let _conn_db = crate::banco_de_dados::create_db::obter_conexao()?;
     // TODO: implementar excluir_item_estoque_db no banco_de_dados/database_est.rs
     Ok(())
 }
