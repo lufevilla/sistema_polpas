@@ -21,3 +21,10 @@ pub enum AppError {
     #[error("O item já está cadastrado no estoque")]
     MercadoriaJaExiste,
 }
+
+#[flutter_rust_bridge::frb]
+impl AppError {
+    pub fn mensagem(&self) -> String {
+        self.to_string()
+    }
+}

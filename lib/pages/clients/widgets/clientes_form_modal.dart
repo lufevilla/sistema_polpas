@@ -2,73 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:sistema_polpas/core/theme/app_colors.dart';
 import 'package:sistema_polpas/pages/clients/clients_controller.dart';
 
-/// Abre o modal de cadastro de um novo cliente.
-Future<void> showAddClienteModal({
+Future<void> mostrarModalNovoCliente({
   required BuildContext context,
-  required void Function(Cliente cliente) onSave,
+  required void Function(ClienteLocal cliente) aoSalvar,
 }) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _ClienteFormModal(onSave: onSave),
+    builder: (_) => _ClienteFormModal(aoSalvar: aoSalvar),
   );
 }
 
-/// Abre o modal de detalhes de um cliente já existente (com opção de
-/// editar ou excluir).
-Future<void> showClienteDetailsModal({
+Future<void> mostrarModalDetalhesCliente({
   required BuildContext context,
-  required Cliente cliente,
-  required void Function(Cliente cliente) onSave,
-  required void Function(String id) onDelete,
+  required ClienteLocal cliente,
+  required void Function(ClienteLocal cliente) aoSalvar,
+  required void Function(ClienteLocal cliente) aoExcluir,
 }) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) =>
-        _ClienteFormModal(cliente: cliente, onSave: onSave, onDelete: onDelete),
+    builder: (_) => _ClienteFormModal(
+      cliente: cliente,
+      aoSalvar: aoSalvar,
+      aoExcluir: aoExcluir,
+    ),
   );
 }
 
-/// Modal único (form) usado tanto para criar quanto para visualizar/editar
-/// um cliente, seguindo exatamente as colunas da tabela `clients`.
 class _ClienteFormModal extends StatefulWidget {
-  final Cliente? cliente;
-  final void Function(Cliente cliente) onSave;
-  final void Function(String id)? onDelete;
+  final ClienteLocal? cliente;
+  final void Function(ClienteLocal cliente) aoSalvar;
+  final void Function(ClienteLocal cliente)? aoExcluir;
 
-  const _ClienteFormModal({this.cliente, required this.onSave, this.onDelete});
+  const _ClienteFormModal({
+    this.cliente,
+    required this.aoSalvar,
+    this.aoExcluir,
+  });
 
   @override
   State<_ClienteFormModal> createState() => _ClienteFormModalState();
 }
 
 class _ClienteFormModalState extends State<_ClienteFormModal> {
-  final _formKey = GlobalKey<FormState>();
+  final _chaveFormulario = GlobalKey<FormState>();
 
   late final _nome = TextEditingController(text: widget.cliente?.nome);
   late final _cadastro = TextEditingController(text: widget.cliente?.cadastro);
   late final _telefone = TextEditingController(text: widget.cliente?.telefone);
-  late final _cep = TextEditingController(text: widget.cliente?.cep);
+  late final _cep = TextEditingController(text: widget.cliente?.endereco.cep);
   late final _logradouro = TextEditingController(
-    text: widget.cliente?.logradouro,
+    text: widget.cliente?.endereco.logradouro,
   );
-  late final _numero = TextEditingController(text: widget.cliente?.numero);
+  late final _numero = TextEditingController(
+    text: widget.cliente?.endereco.numero,
+  );
   late final _complemento = TextEditingController(
-    text: widget.cliente?.complemento,
+    text: widget.cliente?.endereco.complemento ?? '',
   );
-  late final _bairro = TextEditingController(text: widget.cliente?.bairro);
+  late final _bairro = TextEditingController(
+    text: widget.cliente?.endereco.bairro,
+  );
   late final _municipio = TextEditingController(
-    text: widget.cliente?.municipio,
+    text: widget.cliente?.endereco.municipio,
   );
-  late final _uf = TextEditingController(text: widget.cliente?.uf);
+  late final _uf = TextEditingController(text: widget.cliente?.endereco.uf);
 
-  bool get _isEditingExisting => widget.cliente != null;
-  // Cadastro novo já começa em modo de edição; cadastro existente começa
-  // travado, só libera os campos depois de tocar em "Editar".
-  late bool _isEditable = !_isEditingExisting;
+  bool get _editandoExistente => widget.cliente != null;
+  late bool _ehEditavel = !_editandoExistente;
 
   @override
   void dispose() {
@@ -85,33 +89,33 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
     super.dispose();
   }
 
-  void _handleSalvar() {
-    if (!_formKey.currentState!.validate()) return;
+  void _aoSalvar() {
+    if (!_chaveFormulario.currentState!.validate()) return;
 
-    final cliente = Cliente(
-      id:
-          widget.cliente?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+    final cliente = ClienteLocal(
+      id: widget.cliente?.id ?? 0,
       nome: _nome.text.trim(),
       cadastro: _cadastro.text.trim(),
       telefone: _telefone.text.trim(),
-      cep: _cep.text.trim(),
-      logradouro: _logradouro.text.trim(),
-      numero: _numero.text.trim(),
-      complemento: _complemento.text.trim().isEmpty
-          ? null
-          : _complemento.text.trim(),
-      bairro: _bairro.text.trim(),
-      municipio: _municipio.text.trim(),
-      uf: _uf.text.trim(),
+      endereco: EnderecoLocal(
+        cep: _cep.text.trim(),
+        logradouro: _logradouro.text.trim(),
+        numero: _numero.text.trim(),
+        complemento: _complemento.text.trim().isEmpty
+            ? null
+            : _complemento.text.trim(),
+        bairro: _bairro.text.trim(),
+        municipio: _municipio.text.trim(),
+        uf: _uf.text.trim(),
+      ),
       status: widget.cliente?.status ?? ClienteStatus.pendente,
     );
 
-    widget.onSave(cliente);
+    widget.aoSalvar(cliente);
     Navigator.of(context).pop();
   }
 
-  Future<void> _handleExcluir() async {
+  Future<void> _aoExcluir() async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -137,7 +141,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
     );
 
     if (confirmar == true && mounted) {
-      widget.onDelete?.call(widget.cliente!.id);
+      widget.aoExcluir?.call(widget.cliente!);
       Navigator.of(context).pop();
     }
   }
@@ -160,7 +164,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Form(
-              key: _formKey,
+              key: _chaveFormulario,
               child: ListView(
                 controller: scrollController,
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -177,7 +181,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
                     ),
                   ),
                   Text(
-                    _isEditingExisting ? 'Dados do cliente' : 'Novo cliente',
+                    _editandoExistente ? 'Dados do cliente' : 'Novo cliente',
                     style: const TextStyle(
                       color: AppColors.textDark,
                       fontSize: 18,
@@ -185,59 +189,63 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _field(controller: _nome, label: 'Nome completo'),
-                  _field(controller: _cadastro, label: 'Cadastro (CPF/CNPJ)'),
-                  _field(
-                    controller: _telefone,
+                  _campo(controlador: _nome, label: 'Nome completo'),
+                  _campo(controlador: _cadastro, label: 'Cadastro (CPF/CNPJ)'),
+                  _campo(
+                    controlador: _telefone,
                     label: 'Telefone',
-                    keyboardType: TextInputType.phone,
+                    tipoTeclado: TextInputType.phone,
                   ),
-                  _field(
-                    controller: _cep,
+                  _campo(
+                    controlador: _cep,
                     label: 'CEP',
-                    keyboardType: TextInputType.number,
+                    tipoTeclado: TextInputType.number,
                   ),
-                  _field(controller: _logradouro, label: 'Logradouro'),
+                  _campo(controlador: _logradouro, label: 'Logradouro'),
                   Row(
                     children: [
                       Expanded(
                         flex: 2,
-                        child: _field(
-                          controller: _numero,
+                        child: _campo(
+                          controlador: _numero,
                           label: 'Número',
-                          keyboardType: TextInputType.number,
+                          tipoTeclado: TextInputType.number,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         flex: 3,
-                        child: _field(
-                          controller: _complemento,
+                        child: _campo(
+                          controlador: _complemento,
                           label: 'Complemento (opcional)',
-                          required: false,
+                          obrigatorio: false,
                         ),
                       ),
                     ],
                   ),
-                  _field(controller: _bairro, label: 'Bairro'),
+                  _campo(controlador: _bairro, label: 'Bairro'),
                   Row(
                     children: [
                       Expanded(
                         flex: 3,
-                        child: _field(
-                          controller: _municipio,
+                        child: _campo(
+                          controlador: _municipio,
                           label: 'Município',
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         flex: 1,
-                        child: _field(controller: _uf, label: 'UF'),
+                        child: _campo(
+                          controlador: _uf,
+                          label: 'UF',
+                          acaoTeclado: TextInputAction.done,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _actions(),
+                  _acoes(),
                 ],
               ),
             ),
@@ -247,21 +255,23 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
     );
   }
 
-  Widget _field({
-    required TextEditingController controller,
+  Widget _campo({
+    required TextEditingController controlador,
     required String label,
-    TextInputType keyboardType = TextInputType.text,
-    bool required = true,
+    TextInputType tipoTeclado = TextInputType.text,
+    bool obrigatorio = true,
+    TextInputAction acaoTeclado = TextInputAction.next,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
-        controller: controller,
-        enabled: _isEditable,
-        keyboardType: keyboardType,
+        controller: controlador,
+        enabled: _ehEditavel,
+        keyboardType: tipoTeclado,
+        textInputAction: acaoTeclado,
         style: const TextStyle(color: AppColors.textDark, fontSize: 14),
         validator: (value) {
-          if (!required) return null;
+          if (!obrigatorio) return null;
           if (value == null || value.trim().isEmpty) {
             return 'Campo obrigatório';
           }
@@ -271,7 +281,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
           labelText: label,
           labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
           filled: true,
-          fillColor: _isEditable
+          fillColor: _ehEditavel
               ? AppColors.cardBackground
               : const Color(0xFFF3ECE3),
           contentPadding: const EdgeInsets.symmetric(
@@ -295,13 +305,12 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
     );
   }
 
-  Widget _actions() {
-    // Cadastro novo: só o botão de salvar.
-    if (!_isEditingExisting) {
+  Widget _acoes() {
+    if (!_editandoExistente) {
       return SizedBox(
         width: double.infinity,
         child: FilledButton(
-          onPressed: _handleSalvar,
+          onPressed: _aoSalvar,
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.gold,
             foregroundColor: AppColors.textDark,
@@ -318,13 +327,12 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
       );
     }
 
-    // Cliente existente, modo leitura: "Editar" e "Excluir".
-    if (!_isEditable) {
+    if (!_ehEditavel) {
       return Row(
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: _handleExcluir,
+              onPressed: _aoExcluir,
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.danger,
                 side: const BorderSide(color: AppColors.danger),
@@ -339,7 +347,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
           const SizedBox(width: 12),
           Expanded(
             child: FilledButton(
-              onPressed: () => setState(() => _isEditable = true),
+              onPressed: () => setState(() => _ehEditavel = true),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.gold,
                 foregroundColor: AppColors.textDark,
@@ -358,12 +366,11 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
       );
     }
 
-    // Cliente existente, modo edição: "Cancelar" e "Salvar alterações".
     return Row(
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => setState(() => _isEditable = false),
+            onPressed: () => setState(() => _ehEditavel = false),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textDark,
               side: const BorderSide(color: AppColors.border),
@@ -378,7 +385,7 @@ class _ClienteFormModalState extends State<_ClienteFormModal> {
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton(
-            onPressed: _handleSalvar,
+            onPressed: _aoSalvar,
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.textDark,
