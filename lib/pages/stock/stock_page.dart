@@ -18,6 +18,12 @@ class _StockPageState extends State<StockPage> {
   final _controller = StockController();
 
   @override
+  void initState() {
+    super.initState();
+    _controller.carregarEstoque();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -30,6 +36,40 @@ class _StockPageState extends State<StockPage> {
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
+          if (_controller.carregando) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (_controller.erro != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline, size: 48, color: AppColors.danger),
+                    const SizedBox(height: 16),
+                    Text(
+                      _controller.erro!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: AppColors.textDark),
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: _controller.carregarEstoque,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Tentar novamente'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textDark,
+                        side: BorderSide(color: AppColors.border),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return CustomScrollView(
             slivers: [
               SliverPadding(
