@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 
-import '../../rust/estoque.dart' as rust;
+import 'package:sistema_polpas/rust/estoque.dart' as rust;
 import 'models/stock_item.dart';
 
 class StockController extends ChangeNotifier {
   final List<StockItem> _items = [];
   bool _carregando = false;
-  String? _erro;
+  String _erro = '';
 
   List<StockItem> get items => List.unmodifiable(_items);
   bool get carregando => _carregando;
-  String? get erro => _erro;
+  String get erro => _erro;
   int get totalStock => _items.fold(0, (sum, item) => sum + item.quantity);
   int get lowStockCount => _items
       .where(
@@ -23,7 +23,7 @@ class StockController extends ChangeNotifier {
 
   Future<void> carregarEstoque() async {
     _carregando = true;
-    _erro = null;
+    _erro = '';
     notifyListeners();
     try {
       final produtos = await rust.carregarEstoque();
@@ -34,6 +34,29 @@ class StockController extends ChangeNotifier {
       _erro = e.toString();
     } finally {
       _carregando = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> incluirItem({
+    required String nome,
+    required int quantidade,
+    required int quantidadeMinima,
+    required double valorUnitario,
+  }) async {
+    try {
+      await rust.incluirItemEstoque(
+        produto: rust.Produto(
+          idMerc: 0,
+          nomeMerc: nome,
+          quantidadeEst: quantidade,
+          quantidadeMinima: quantidadeMinima,
+          valorUnitario: valorUnitario,
+        ),
+      );
+      await carregarEstoque();
+    } catch (e) {
+      _erro = e.toString();
       notifyListeners();
     }
   }
@@ -61,6 +84,16 @@ class StockController extends ChangeNotifier {
         idMerc: int.parse(id),
         quantidadeSaida: 1,
       );
+      await carregarEstoque();
+    } catch (e) {
+      _erro = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> excluirItem(String id) async {
+    try {
+      await rust.excluirItemEstoque(idMerc: int.parse(id));
       await carregarEstoque();
     } catch (e) {
       _erro = e.toString();

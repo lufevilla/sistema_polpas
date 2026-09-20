@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 313232934;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -2050640170;
 
 // Section: executor
 
@@ -89,7 +89,7 @@ fn wire__crate__api__clientes_service__atualizar_cliente_service_impl(
         },
     )
 }
-fn wire__crate__api__estoque_service__entrada_no_estoque_service_impl(
+fn wire__crate__api__pedidos_service__criar_pedido_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -97,7 +97,7 @@ fn wire__crate__api__estoque_service__entrada_no_estoque_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "entrada_no_estoque_service",
+            debug_name: "criar_pedido",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -111,14 +111,56 @@ fn wire__crate__api__estoque_service__entrada_no_estoque_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_produto = <crate::models::pedido::Produto>::sse_decode(&mut deserializer);
+            let api_cliente_id = <i64>::sse_decode(&mut deserializer);
+            let api_itens = <Vec<crate::models::pedido::ItemPedido>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
                         let output_ok =
-                            crate::api::estoque_service::entrada_no_estoque_service(api_produto)
+                            crate::api::pedidos_service::criar_pedido(api_cliente_id, api_itens)
                                 .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__estoque_service__entrada_no_estoque_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "entrada_no_estoque",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_id_merc = <i64>::sse_decode(&mut deserializer);
+            let api_quantidade_a_adicionar = <i64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, AppError>(
+                    (move || async move {
+                        let output_ok = crate::api::estoque_service::entrada_no_estoque(
+                            api_id_merc,
+                            api_quantidade_a_adicionar,
+                        )
+                        .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -149,17 +191,14 @@ fn wire__crate__api__clientes_service__excluir_cliente_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api__cliente = <crate::models::cliente::Cliente>::sse_decode(&mut deserializer);
             let api_cliente_id = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
-                        let output_ok = crate::api::clientes_service::excluir_cliente_service(
-                            api__cliente,
-                            api_cliente_id,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::clientes_service::excluir_cliente_service(api_cliente_id)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -168,7 +207,7 @@ fn wire__crate__api__clientes_service__excluir_cliente_service_impl(
         },
     )
 }
-fn wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
+fn wire__crate__api__estoque_service__excluir_item_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -176,7 +215,7 @@ fn wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "excluir_item_estoque_service",
+            debug_name: "excluir_item",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -190,14 +229,13 @@ fn wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api__item_id = <i64>::sse_decode(&mut deserializer);
+            let api_id_merc = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
                         let output_ok =
-                            crate::api::estoque_service::excluir_item_estoque_service(api__item_id)
-                                .await?;
+                            crate::api::estoque_service::excluir_item(api_id_merc).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -206,7 +244,7 @@ fn wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
         },
     )
 }
-fn wire__crate__api__pedidos_service__excluir_pedido_service_impl(
+fn wire__crate__api__pedidos_service__excluir_pedido_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -214,7 +252,7 @@ fn wire__crate__api__pedidos_service__excluir_pedido_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "excluir_pedido_service",
+            debug_name: "excluir_pedido",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -234,8 +272,7 @@ fn wire__crate__api__pedidos_service__excluir_pedido_service_impl(
                 transform_result_sse::<_, AppError>(
                     (move || async move {
                         let output_ok =
-                            crate::api::pedidos_service::excluir_pedido_service(api_pedido_id)
-                                .await?;
+                            crate::api::pedidos_service::excluir_pedido(api_pedido_id).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -342,7 +379,7 @@ fn wire__crate__api__clientes_service__incluir_cliente_service_impl(
         },
     )
 }
-fn wire__crate__api__estoque_service__incluir_item_estoque_service_impl(
+fn wire__crate__api__estoque_service__incluir_item_estoque_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -350,7 +387,7 @@ fn wire__crate__api__estoque_service__incluir_item_estoque_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "incluir_item_estoque_service",
+            debug_name: "incluir_item_estoque",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -364,17 +401,13 @@ fn wire__crate__api__estoque_service__incluir_item_estoque_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_nome_merc = <String>::sse_decode(&mut deserializer);
-            let api_quantidade_est = <i64>::sse_decode(&mut deserializer);
+            let api_produto = <crate::models::pedido::Produto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
-                        let output_ok = crate::api::estoque_service::incluir_item_estoque_service(
-                            api_nome_merc,
-                            api_quantidade_est,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::estoque_service::incluir_item_estoque(api_produto).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -417,7 +450,7 @@ fn wire__crate__api__simple__init_app_impl(
         },
     )
 }
-fn wire__crate__api__estoque_service__listagem_do_estoque_service_impl(
+fn wire__crate__api__estoque_service__listagem_do_estoque_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -425,7 +458,7 @@ fn wire__crate__api__estoque_service__listagem_do_estoque_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "listagem_do_estoque_service",
+            debug_name: "listagem_do_estoque",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -443,8 +476,7 @@ fn wire__crate__api__estoque_service__listagem_do_estoque_service_impl(
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::estoque_service::listagem_do_estoque_service().await?;
+                        let output_ok = crate::api::estoque_service::listagem_do_estoque().await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -489,7 +521,7 @@ fn wire__crate__api__clientes_service__listar_clientes_service_impl(
         },
     )
 }
-fn wire__crate__api__pedidos_service__listar_pedidos_service_impl(
+fn wire__crate__api__pedidos_service__listar_pedidos_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -497,7 +529,7 @@ fn wire__crate__api__pedidos_service__listar_pedidos_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "listar_pedidos_service",
+            debug_name: "listar_pedidos",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -515,8 +547,7 @@ fn wire__crate__api__pedidos_service__listar_pedidos_service_impl(
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::pedidos_service::listar_pedidos_service().await?;
+                        let output_ok = crate::api::pedidos_service::listar_pedidos().await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -525,7 +556,7 @@ fn wire__crate__api__pedidos_service__listar_pedidos_service_impl(
         },
     )
 }
-fn wire__crate__api__pedidos_service__novo_pedido_service_impl(
+fn wire__crate__api__estoque_service__saida_estoque_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -533,7 +564,7 @@ fn wire__crate__api__pedidos_service__novo_pedido_service_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "novo_pedido_service",
+            debug_name: "saida_estoque",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -547,15 +578,17 @@ fn wire__crate__api__pedidos_service__novo_pedido_service_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_pedido = <crate::models::pedido::Pedido>::sse_decode(&mut deserializer);
-            let api_itens = <Vec<crate::models::pedido::ItemPedido>>::sse_decode(&mut deserializer);
+            let api_quantidade_saida = <i64>::sse_decode(&mut deserializer);
+            let api_id_merc = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::pedidos_service::novo_pedido_service(api_pedido, api_itens)
-                                .await?;
+                        let output_ok = crate::api::estoque_service::saida_estoque(
+                            api_quantidade_saida,
+                            api_id_merc,
+                        )
+                        .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -659,16 +692,14 @@ impl SseDecode for crate::models::pedido::ItemPedido {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_idItem = <i64>::sse_decode(deserializer);
-        let mut var_produtoNome = <String>::sse_decode(deserializer);
+        let mut var_produto = <crate::models::pedido::Produto>::sse_decode(deserializer);
         let mut var_quantidade = <i64>::sse_decode(deserializer);
         let mut var_valor = <f64>::sse_decode(deserializer);
-        let mut var_subtotal = <f64>::sse_decode(deserializer);
         return crate::models::pedido::ItemPedido {
             id_item: var_idItem,
-            produto_nome: var_produtoNome,
+            produto: var_produto,
             quantidade: var_quantidade,
             valor: var_valor,
-            subtotal: var_subtotal,
         };
     }
 }
@@ -770,10 +801,14 @@ impl SseDecode for crate::models::pedido::Produto {
         let mut var_idMerc = <i64>::sse_decode(deserializer);
         let mut var_nomeMerc = <String>::sse_decode(deserializer);
         let mut var_quantidadeEst = <i64>::sse_decode(deserializer);
+        let mut var_quantidadeMinima = <i64>::sse_decode(deserializer);
+        let mut var_valorUnitario = <f64>::sse_decode(deserializer);
         return crate::models::pedido::Produto {
             id_merc: var_idMerc,
             nome_merc: var_nomeMerc,
             quantidade_est: var_quantidadeEst,
+            quantidade_minima: var_quantidadeMinima,
+            valor_unitario: var_valorUnitario,
         };
     }
 }
@@ -826,67 +861,64 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        2 => wire__crate__api__estoque_service__entrada_no_estoque_service_impl(
+        2 => {
+            wire__crate__api__pedidos_service__criar_pedido_impl(port, ptr, rust_vec_len, data_len)
+        }
+        3 => wire__crate__api__estoque_service__entrada_no_estoque_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        3 => wire__crate__api__clientes_service__excluir_cliente_service_impl(
+        4 => wire__crate__api__clientes_service__excluir_cliente_service_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__estoque_service__excluir_item_estoque_service_impl(
+        5 => {
+            wire__crate__api__estoque_service__excluir_item_impl(port, ptr, rust_vec_len, data_len)
+        }
+        6 => wire__crate__api__pedidos_service__excluir_pedido_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        5 => wire__crate__api__pedidos_service__excluir_pedido_service_impl(
+        9 => wire__crate__api__clientes_service__incluir_cliente_service_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        8 => wire__crate__api__clientes_service__incluir_cliente_service_impl(
+        10 => wire__crate__api__estoque_service__incluir_item_estoque_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        9 => wire__crate__api__estoque_service__incluir_item_estoque_service_impl(
+        11 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__estoque_service__listagem_do_estoque_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__estoque_service__listagem_do_estoque_service_impl(
+        13 => wire__crate__api__clientes_service__listar_clientes_service_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__clientes_service__listar_clientes_service_impl(
+        14 => wire__crate__api__pedidos_service__listar_pedidos_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__pedidos_service__listar_pedidos_service_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        14 => wire__crate__api__pedidos_service__novo_pedido_service_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
+        15 => {
+            wire__crate__api__estoque_service__saida_estoque_impl(port, ptr, rust_vec_len, data_len)
+        }
         _ => unreachable!(),
     }
 }
@@ -899,8 +931,8 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        6 => wire__crate__api__simple__extrair_mensagem_erro_impl(ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__simple__extrair_mensagem_erro_impl(ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -977,10 +1009,9 @@ impl flutter_rust_bridge::IntoDart for crate::models::pedido::ItemPedido {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.id_item.into_into_dart().into_dart(),
-            self.produto_nome.into_into_dart().into_dart(),
+            self.produto.into_into_dart().into_dart(),
             self.quantidade.into_into_dart().into_dart(),
             self.valor.into_into_dart().into_dart(),
-            self.subtotal.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1024,6 +1055,8 @@ impl flutter_rust_bridge::IntoDart for crate::models::pedido::Produto {
             self.id_merc.into_into_dart().into_dart(),
             self.nome_merc.into_into_dart().into_dart(),
             self.quantidade_est.into_into_dart().into_dart(),
+            self.quantidade_minima.into_into_dart().into_dart(),
+            self.valor_unitario.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1107,10 +1140,9 @@ impl SseEncode for crate::models::pedido::ItemPedido {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i64>::sse_encode(self.id_item, serializer);
-        <String>::sse_encode(self.produto_nome, serializer);
+        <crate::models::pedido::Produto>::sse_encode(self.produto, serializer);
         <i64>::sse_encode(self.quantidade, serializer);
         <f64>::sse_encode(self.valor, serializer);
-        <f64>::sse_encode(self.subtotal, serializer);
     }
 }
 
@@ -1191,6 +1223,8 @@ impl SseEncode for crate::models::pedido::Produto {
         <i64>::sse_encode(self.id_merc, serializer);
         <String>::sse_encode(self.nome_merc, serializer);
         <i64>::sse_encode(self.quantidade_est, serializer);
+        <i64>::sse_encode(self.quantidade_minima, serializer);
+        <f64>::sse_encode(self.valor_unitario, serializer);
     }
 }
 

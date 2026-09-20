@@ -1,19 +1,19 @@
-import '../src/rust/api/pedidos_service.dart';
+import '../src/rust/api/pedidos_service.dart' as svc;
 import '../src/rust/models/pedido.dart';
 
 export '../src/rust/models/pedido.dart' show Pedido, ItemPedido;
 
-Future<void> novoPedido({
-  required Pedido pedido,
+Future<int> criarPedido({
+  required int clienteId,
   required List<ItemPedido> itens,
 }) {
-  return novoPedidoService(pedido: pedido, itens: itens);
+  return svc.criarPedido(clienteId: clienteId, itens: itens);
 }
 
 Future<List<Pedido>> listarPedidos() {
-  return listarPedidosService();
+  return svc.listarPedidos();
 }
 
 Future<void> excluirPedido({required int pedidoId}) {
-  return excluirPedidoService(pedidoId: pedidoId);
+  return svc.excluirPedido(pedidoId: pedidoId);
 }

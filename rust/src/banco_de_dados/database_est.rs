@@ -38,7 +38,7 @@ pub fn saida_est_db(quantidade_saida: i64, id_merc: i64) -> Result<(), AppError>
     let mut stmt = conn_db.prepare("
         SELECT quantidade_est - ?1 >= 0 
         FROM estoque
-        WHERE nome_merc = ?2
+        WHERE id_merc = ?2
     ")?;
     let resultado: bool = stmt.query_row(
         (quantidade_saida,id_merc), 
