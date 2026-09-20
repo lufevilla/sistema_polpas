@@ -1,3 +1,5 @@
+import '../../../rust/estoque.dart' show Produto;
+
 /// Visual status of a stock item, derived from its occupancy rate
 /// (quantity / capacity).
 enum StockStatus { high, adequate, attention, low, critical, outOfStock }
@@ -35,6 +37,16 @@ class StockItem {
     required this.quantity,
     required this.capacity,
   });
+
+  factory StockItem.fromProduto(Produto p) {
+    return StockItem(
+      id: p.idMerc.toString(),
+      name: p.nomeMerc,
+      packageLabel: 'Pacote 1kg',
+      quantity: p.quantidadeEst.toInt(),
+      capacity: p.quantidadeMinima.toInt(),
+    );
+  }
 
   double get occupancyRatio => capacity == 0 ? 0 : quantity / capacity;
 
