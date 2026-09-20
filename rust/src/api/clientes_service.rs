@@ -29,6 +29,11 @@ pub async fn excluir_cliente_service(cliente_id: i64) -> Result<(), AppError>{
     excluir_cliente_db(cliente_id)
 }
 
+pub async fn listar_clientes_service() -> Result<Vec<Cliente>, AppError> {
+    let clientes = listar_clientes_db()?;
+    Ok(clientes)
+}
+
 fn checagem_presenca_dados(cliente: &Cliente) -> Result<(), AppError>{
         let campos_obrigatorios = [ 
         ("Nome", cliente.nome.as_str()),
