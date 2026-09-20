@@ -49,9 +49,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Cliente dco_decode_box_autoadd_cliente(dynamic raw);
 
   @protected
-  Pedido dco_decode_box_autoadd_pedido(dynamic raw);
-
-  @protected
   Produto dco_decode_box_autoadd_produto(dynamic raw);
 
   @protected
@@ -119,9 +116,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Cliente sse_decode_box_autoadd_cliente(SseDeserializer deserializer);
-
-  @protected
-  Pedido sse_decode_box_autoadd_pedido(SseDeserializer deserializer);
 
   @protected
   Produto sse_decode_box_autoadd_produto(SseDeserializer deserializer);
@@ -199,9 +193,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_cliente(Cliente self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_pedido(Pedido self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_produto(Produto self, SseSerializer serializer);

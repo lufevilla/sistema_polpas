@@ -8,18 +8,18 @@ import '../frb_generated.dart';
 import '../models/pedido.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> novoPedidoService({
-  required Pedido pedido,
+Future<PlatformInt64> criarPedido({
+  required PlatformInt64 clienteId,
   required List<ItemPedido> itens,
-}) => RustLib.instance.api.crateApiPedidosServiceNovoPedidoService(
-  pedido: pedido,
+}) => RustLib.instance.api.crateApiPedidosServiceCriarPedido(
+  clienteId: clienteId,
   itens: itens,
 );
 
-Future<List<Pedido>> listarPedidosService() =>
-    RustLib.instance.api.crateApiPedidosServiceListarPedidosService();
+Future<List<Pedido>> listarPedidos() =>
+    RustLib.instance.api.crateApiPedidosServiceListarPedidos();
 
-Future<void> excluirPedidoService({required PlatformInt64 pedidoId}) => RustLib
+Future<void> excluirPedido({required PlatformInt64 pedidoId}) => RustLib
     .instance
     .api
-    .crateApiPedidosServiceExcluirPedidoService(pedidoId: pedidoId);
+    .crateApiPedidosServiceExcluirPedido(pedidoId: pedidoId);
