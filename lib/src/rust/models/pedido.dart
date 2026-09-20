@@ -8,26 +8,20 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class ItemPedido {
   final PlatformInt64 idItem;
-  final String produtoNome;
+  final Produto produto;
   final PlatformInt64 quantidade;
   final double valor;
-  final double subtotal;
 
   const ItemPedido({
     required this.idItem,
-    required this.produtoNome,
+    required this.produto,
     required this.quantidade,
     required this.valor,
-    required this.subtotal,
   });
 
   @override
   int get hashCode =>
-      idItem.hashCode ^
-      produtoNome.hashCode ^
-      quantidade.hashCode ^
-      valor.hashCode ^
-      subtotal.hashCode;
+      idItem.hashCode ^ produto.hashCode ^ quantidade.hashCode ^ valor.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -35,10 +29,9 @@ class ItemPedido {
       other is ItemPedido &&
           runtimeType == other.runtimeType &&
           idItem == other.idItem &&
-          produtoNome == other.produtoNome &&
+          produto == other.produto &&
           quantidade == other.quantidade &&
-          valor == other.valor &&
-          subtotal == other.subtotal;
+          valor == other.valor;
 }
 
 class Pedido {
@@ -80,16 +73,24 @@ class Produto {
   final PlatformInt64 idMerc;
   final String nomeMerc;
   final PlatformInt64 quantidadeEst;
+  final PlatformInt64 quantidadeMinima;
+  final double valorUnitario;
 
   const Produto({
     required this.idMerc,
     required this.nomeMerc,
     required this.quantidadeEst,
+    required this.quantidadeMinima,
+    required this.valorUnitario,
   });
 
   @override
   int get hashCode =>
-      idMerc.hashCode ^ nomeMerc.hashCode ^ quantidadeEst.hashCode;
+      idMerc.hashCode ^
+      nomeMerc.hashCode ^
+      quantidadeEst.hashCode ^
+      quantidadeMinima.hashCode ^
+      valorUnitario.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -98,5 +99,7 @@ class Produto {
           runtimeType == other.runtimeType &&
           idMerc == other.idMerc &&
           nomeMerc == other.nomeMerc &&
-          quantidadeEst == other.quantidadeEst;
+          quantidadeEst == other.quantidadeEst &&
+          quantidadeMinima == other.quantidadeMinima &&
+          valorUnitario == other.valorUnitario;
 }

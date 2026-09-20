@@ -72,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 313232934;
+  int get rustContentHash => -2050640170;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -89,20 +89,25 @@ abstract class RustLibApi extends BaseApi {
     required PlatformInt64 clienteId,
   });
 
-  Future<void> crateApiEstoqueServiceEntradaNoEstoqueService({
-    required Produto produto,
+  Future<PlatformInt64> crateApiPedidosServiceCriarPedido({
+    required PlatformInt64 clienteId,
+    required List<ItemPedido> itens,
+  });
+
+  Future<void> crateApiEstoqueServiceEntradaNoEstoque({
+    required PlatformInt64 idMerc,
+    required PlatformInt64 quantidadeAAdicionar,
   });
 
   Future<void> crateApiClientesServiceExcluirClienteService({
-    required Cliente cliente,
     required PlatformInt64 clienteId,
   });
 
-  Future<void> crateApiEstoqueServiceExcluirItemEstoqueService({
-    required PlatformInt64 itemId,
+  Future<void> crateApiEstoqueServiceExcluirItem({
+    required PlatformInt64 idMerc,
   });
 
-  Future<void> crateApiPedidosServiceExcluirPedidoService({
+  Future<void> crateApiPedidosServiceExcluirPedido({
     required PlatformInt64 pedidoId,
   });
 
@@ -114,22 +119,21 @@ abstract class RustLibApi extends BaseApi {
     required Cliente cliente,
   });
 
-  Future<void> crateApiEstoqueServiceIncluirItemEstoqueService({
-    required String nomeMerc,
-    required PlatformInt64 quantidadeEst,
+  Future<void> crateApiEstoqueServiceIncluirItemEstoque({
+    required Produto produto,
   });
 
   Future<void> crateApiSimpleInitApp();
 
-  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoqueService();
+  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoque();
 
   Future<List<Cliente>> crateApiClientesServiceListarClientesService();
 
-  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService();
+  Future<List<Pedido>> crateApiPedidosServiceListarPedidos();
 
-  Future<void> crateApiPedidosServiceNovoPedidoService({
-    required Pedido pedido,
-    required List<ItemPedido> itens,
+  Future<void> crateApiEstoqueServiceSaidaEstoque({
+    required PlatformInt64 quantidadeSaida,
+    required PlatformInt64 idMerc,
   });
 
   RustArcIncrementStrongCountFnType
@@ -186,14 +190,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiEstoqueServiceEntradaNoEstoqueService({
-    required Produto produto,
+  Future<PlatformInt64> crateApiPedidosServiceCriarPedido({
+    required PlatformInt64 clienteId,
+    required List<ItemPedido> itens,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_produto(produto, serializer);
+          sse_encode_i_64(clienteId, serializer);
+          sse_encode_list_item_pedido(itens, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -202,34 +208,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
+          decodeSuccessData: sse_decode_i_64,
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiEstoqueServiceEntradaNoEstoqueServiceConstMeta,
-        argValues: [produto],
+        constMeta: kCrateApiPedidosServiceCriarPedidoConstMeta,
+        argValues: [clienteId, itens],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiEstoqueServiceEntradaNoEstoqueServiceConstMeta =>
+  TaskConstMeta get kCrateApiPedidosServiceCriarPedidoConstMeta =>
       const TaskConstMeta(
-        debugName: "entrada_no_estoque_service",
-        argNames: ["produto"],
+        debugName: "criar_pedido",
+        argNames: ["clienteId", "itens"],
       );
 
   @override
-  Future<void> crateApiClientesServiceExcluirClienteService({
-    required Cliente cliente,
-    required PlatformInt64 clienteId,
+  Future<void> crateApiEstoqueServiceEntradaNoEstoque({
+    required PlatformInt64 idMerc,
+    required PlatformInt64 quantidadeAAdicionar,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_cliente(cliente, serializer);
-          sse_encode_i_64(clienteId, serializer);
+          sse_encode_i_64(idMerc, serializer);
+          sse_encode_i_64(quantidadeAAdicionar, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -242,28 +248,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiClientesServiceExcluirClienteServiceConstMeta,
-        argValues: [cliente, clienteId],
+        constMeta: kCrateApiEstoqueServiceEntradaNoEstoqueConstMeta,
+        argValues: [idMerc, quantidadeAAdicionar],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiClientesServiceExcluirClienteServiceConstMeta =>
+  TaskConstMeta get kCrateApiEstoqueServiceEntradaNoEstoqueConstMeta =>
       const TaskConstMeta(
-        debugName: "excluir_cliente_service",
-        argNames: ["cliente", "clienteId"],
+        debugName: "entrada_no_estoque",
+        argNames: ["idMerc", "quantidadeAAdicionar"],
       );
 
   @override
-  Future<void> crateApiEstoqueServiceExcluirItemEstoqueService({
-    required PlatformInt64 itemId,
+  Future<void> crateApiClientesServiceExcluirClienteService({
+    required PlatformInt64 clienteId,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(itemId, serializer);
+          sse_encode_i_64(clienteId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -276,28 +282,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiEstoqueServiceExcluirItemEstoqueServiceConstMeta,
-        argValues: [itemId],
+        constMeta: kCrateApiClientesServiceExcluirClienteServiceConstMeta,
+        argValues: [clienteId],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiEstoqueServiceExcluirItemEstoqueServiceConstMeta =>
+  TaskConstMeta get kCrateApiClientesServiceExcluirClienteServiceConstMeta =>
       const TaskConstMeta(
-        debugName: "excluir_item_estoque_service",
-        argNames: ["itemId"],
+        debugName: "excluir_cliente_service",
+        argNames: ["clienteId"],
       );
 
   @override
-  Future<void> crateApiPedidosServiceExcluirPedidoService({
-    required PlatformInt64 pedidoId,
+  Future<void> crateApiEstoqueServiceExcluirItem({
+    required PlatformInt64 idMerc,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(pedidoId, serializer);
+          sse_encode_i_64(idMerc, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -310,18 +316,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiPedidosServiceExcluirPedidoServiceConstMeta,
+        constMeta: kCrateApiEstoqueServiceExcluirItemConstMeta,
+        argValues: [idMerc],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceExcluirItemConstMeta =>
+      const TaskConstMeta(debugName: "excluir_item", argNames: ["idMerc"]);
+
+  @override
+  Future<void> crateApiPedidosServiceExcluirPedido({
+    required PlatformInt64 pedidoId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(pedidoId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiPedidosServiceExcluirPedidoConstMeta,
         argValues: [pedidoId],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiPedidosServiceExcluirPedidoServiceConstMeta =>
-      const TaskConstMeta(
-        debugName: "excluir_pedido_service",
-        argNames: ["pedidoId"],
-      );
+  TaskConstMeta get kCrateApiPedidosServiceExcluirPedidoConstMeta =>
+      const TaskConstMeta(debugName: "excluir_pedido", argNames: ["pedidoId"]);
 
   @override
   String crateApiSimpleExtrairMensagemErro({required AppError erro}) {
@@ -333,7 +367,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             erro,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -359,7 +393,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -387,7 +421,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 8,
+            funcId: 9,
             port: port_,
           );
         },
@@ -410,20 +444,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiEstoqueServiceIncluirItemEstoqueService({
-    required String nomeMerc,
-    required PlatformInt64 quantidadeEst,
+  Future<void> crateApiEstoqueServiceIncluirItemEstoque({
+    required Produto produto,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(nomeMerc, serializer);
-          sse_encode_i_64(quantidadeEst, serializer);
+          sse_encode_box_autoadd_produto(produto, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 9,
+            funcId: 10,
             port: port_,
           );
         },
@@ -432,17 +464,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiEstoqueServiceIncluirItemEstoqueServiceConstMeta,
-        argValues: [nomeMerc, quantidadeEst],
+        constMeta: kCrateApiEstoqueServiceIncluirItemEstoqueConstMeta,
+        argValues: [produto],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiEstoqueServiceIncluirItemEstoqueServiceConstMeta =>
+  TaskConstMeta get kCrateApiEstoqueServiceIncluirItemEstoqueConstMeta =>
       const TaskConstMeta(
-        debugName: "incluir_item_estoque_service",
-        argNames: ["nomeMerc", "quantidadeEst"],
+        debugName: "incluir_item_estoque",
+        argNames: ["produto"],
       );
 
   @override
@@ -454,7 +486,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 10,
+            funcId: 11,
             port: port_,
           );
         },
@@ -473,7 +505,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
-  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoqueService() {
+  Future<List<Produto>> crateApiEstoqueServiceListagemDoEstoque() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -481,7 +513,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 12,
             port: port_,
           );
         },
@@ -490,18 +522,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiEstoqueServiceListagemDoEstoqueServiceConstMeta,
+        constMeta: kCrateApiEstoqueServiceListagemDoEstoqueConstMeta,
         argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiEstoqueServiceListagemDoEstoqueServiceConstMeta =>
-      const TaskConstMeta(
-        debugName: "listagem_do_estoque_service",
-        argNames: [],
-      );
+  TaskConstMeta get kCrateApiEstoqueServiceListagemDoEstoqueConstMeta =>
+      const TaskConstMeta(debugName: "listagem_do_estoque", argNames: []);
 
   @override
   Future<List<Cliente>> crateApiClientesServiceListarClientesService() {
@@ -512,7 +541,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 12,
+            funcId: 13,
             port: port_,
           );
         },
@@ -532,44 +561,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "listar_clientes_service", argNames: []);
 
   @override
-  Future<List<Pedido>> crateApiPedidosServiceListarPedidosService() {
+  Future<List<Pedido>> crateApiPedidosServiceListarPedidos() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 13,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_pedido,
-          decodeErrorData:
-              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
-        ),
-        constMeta: kCrateApiPedidosServiceListarPedidosServiceConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiPedidosServiceListarPedidosServiceConstMeta =>
-      const TaskConstMeta(debugName: "listar_pedidos_service", argNames: []);
-
-  @override
-  Future<void> crateApiPedidosServiceNovoPedidoService({
-    required Pedido pedido,
-    required List<ItemPedido> itens,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_pedido(pedido, serializer);
-          sse_encode_list_item_pedido(itens, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -578,21 +574,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
+          decodeSuccessData: sse_decode_list_pedido,
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
-        constMeta: kCrateApiPedidosServiceNovoPedidoServiceConstMeta,
-        argValues: [pedido, itens],
+        constMeta: kCrateApiPedidosServiceListarPedidosConstMeta,
+        argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiPedidosServiceNovoPedidoServiceConstMeta =>
+  TaskConstMeta get kCrateApiPedidosServiceListarPedidosConstMeta =>
+      const TaskConstMeta(debugName: "listar_pedidos", argNames: []);
+
+  @override
+  Future<void> crateApiEstoqueServiceSaidaEstoque({
+    required PlatformInt64 quantidadeSaida,
+    required PlatformInt64 idMerc,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(quantidadeSaida, serializer);
+          sse_encode_i_64(idMerc, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiEstoqueServiceSaidaEstoqueConstMeta,
+        argValues: [quantidadeSaida, idMerc],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEstoqueServiceSaidaEstoqueConstMeta =>
       const TaskConstMeta(
-        debugName: "novo_pedido_service",
-        argNames: ["pedido", "itens"],
+        debugName: "saida_estoque",
+        argNames: ["quantidadeSaida", "idMerc"],
       );
 
   RustArcIncrementStrongCountFnType
@@ -631,12 +660,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Cliente dco_decode_box_autoadd_cliente(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_cliente(raw);
-  }
-
-  @protected
-  Pedido dco_decode_box_autoadd_pedido(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_pedido(raw);
   }
 
   @protected
@@ -693,14 +716,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ItemPedido dco_decode_item_pedido(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ItemPedido(
       idItem: dco_decode_i_64(arr[0]),
-      produtoNome: dco_decode_String(arr[1]),
+      produto: dco_decode_produto(arr[1]),
       quantidade: dco_decode_i_64(arr[2]),
       valor: dco_decode_f_64(arr[3]),
-      subtotal: dco_decode_f_64(arr[4]),
     );
   }
 
@@ -759,12 +781,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Produto dco_decode_produto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return Produto(
       idMerc: dco_decode_i_64(arr[0]),
       nomeMerc: dco_decode_String(arr[1]),
       quantidadeEst: dco_decode_i_64(arr[2]),
+      quantidadeMinima: dco_decode_i_64(arr[3]),
+      valorUnitario: dco_decode_f_64(arr[4]),
     );
   }
 
@@ -821,12 +845,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Cliente sse_decode_box_autoadd_cliente(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_cliente(deserializer));
-  }
-
-  @protected
-  Pedido sse_decode_box_autoadd_pedido(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_pedido(deserializer));
   }
 
   @protected
@@ -889,16 +907,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ItemPedido sse_decode_item_pedido(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_idItem = sse_decode_i_64(deserializer);
-    var var_produtoNome = sse_decode_String(deserializer);
+    var var_produto = sse_decode_produto(deserializer);
     var var_quantidade = sse_decode_i_64(deserializer);
     var var_valor = sse_decode_f_64(deserializer);
-    var var_subtotal = sse_decode_f_64(deserializer);
     return ItemPedido(
       idItem: var_idItem,
-      produtoNome: var_produtoNome,
+      produto: var_produto,
       quantidade: var_quantidade,
       valor: var_valor,
-      subtotal: var_subtotal,
     );
   }
 
@@ -991,10 +1007,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_idMerc = sse_decode_i_64(deserializer);
     var var_nomeMerc = sse_decode_String(deserializer);
     var var_quantidadeEst = sse_decode_i_64(deserializer);
+    var var_quantidadeMinima = sse_decode_i_64(deserializer);
+    var var_valorUnitario = sse_decode_f_64(deserializer);
     return Produto(
       idMerc: var_idMerc,
       nomeMerc: var_nomeMerc,
       quantidadeEst: var_quantidadeEst,
+      quantidadeMinima: var_quantidadeMinima,
+      valorUnitario: var_valorUnitario,
     );
   }
 
@@ -1066,12 +1086,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_pedido(Pedido self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_pedido(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_produto(Produto self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_produto(self, serializer);
@@ -1115,10 +1129,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_item_pedido(ItemPedido self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_64(self.idItem, serializer);
-    sse_encode_String(self.produtoNome, serializer);
+    sse_encode_produto(self.produto, serializer);
     sse_encode_i_64(self.quantidade, serializer);
     sse_encode_f_64(self.valor, serializer);
-    sse_encode_f_64(self.subtotal, serializer);
   }
 
   @protected
@@ -1196,6 +1209,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.idMerc, serializer);
     sse_encode_String(self.nomeMerc, serializer);
     sse_encode_i_64(self.quantidadeEst, serializer);
+    sse_encode_i_64(self.quantidadeMinima, serializer);
+    sse_encode_f_64(self.valorUnitario, serializer);
   }
 
   @protected

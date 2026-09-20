@@ -8,23 +8,31 @@ import '../frb_generated.dart';
 import '../models/pedido.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> entradaNoEstoqueService({required Produto produto}) => RustLib
+// These functions are ignored because they are not marked as `pub`: `checagem_presenca_dados`
+
+Future<void> incluirItemEstoque({required Produto produto}) => RustLib
     .instance
     .api
-    .crateApiEstoqueServiceEntradaNoEstoqueService(produto: produto);
+    .crateApiEstoqueServiceIncluirItemEstoque(produto: produto);
 
-Future<List<Produto>> listagemDoEstoqueService() =>
-    RustLib.instance.api.crateApiEstoqueServiceListagemDoEstoqueService();
-
-Future<void> incluirItemEstoqueService({
-  required String nomeMerc,
-  required PlatformInt64 quantidadeEst,
-}) => RustLib.instance.api.crateApiEstoqueServiceIncluirItemEstoqueService(
-  nomeMerc: nomeMerc,
-  quantidadeEst: quantidadeEst,
+Future<void> entradaNoEstoque({
+  required PlatformInt64 idMerc,
+  required PlatformInt64 quantidadeAAdicionar,
+}) => RustLib.instance.api.crateApiEstoqueServiceEntradaNoEstoque(
+  idMerc: idMerc,
+  quantidadeAAdicionar: quantidadeAAdicionar,
 );
 
-Future<void> excluirItemEstoqueService({required PlatformInt64 itemId}) =>
-    RustLib.instance.api.crateApiEstoqueServiceExcluirItemEstoqueService(
-      itemId: itemId,
-    );
+Future<List<Produto>> listagemDoEstoque() =>
+    RustLib.instance.api.crateApiEstoqueServiceListagemDoEstoque();
+
+Future<void> saidaEstoque({
+  required PlatformInt64 quantidadeSaida,
+  required PlatformInt64 idMerc,
+}) => RustLib.instance.api.crateApiEstoqueServiceSaidaEstoque(
+  quantidadeSaida: quantidadeSaida,
+  idMerc: idMerc,
+);
+
+Future<void> excluirItem({required PlatformInt64 idMerc}) =>
+    RustLib.instance.api.crateApiEstoqueServiceExcluirItem(idMerc: idMerc);

@@ -23,13 +23,10 @@ Future<void> atualizarClienteService({
   clienteId: clienteId,
 );
 
-Future<void> excluirClienteService({
-  required Cliente cliente,
-  required PlatformInt64 clienteId,
-}) => RustLib.instance.api.crateApiClientesServiceExcluirClienteService(
-  cliente: cliente,
-  clienteId: clienteId,
-);
+Future<void> excluirClienteService({required PlatformInt64 clienteId}) =>
+    RustLib.instance.api.crateApiClientesServiceExcluirClienteService(
+      clienteId: clienteId,
+    );
 
 Future<List<Cliente>> listarClientesService() =>
     RustLib.instance.api.crateApiClientesServiceListarClientesService();
