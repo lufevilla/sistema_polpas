@@ -1,35 +1,37 @@
-use rusqlite::{Connection, Result};
 use std::collections::HashMap;
 use crate::models::pedido::*;
+use crate::banco_de_dados::create_db::obter_conexao;
+use crate::error::AppError;
 
-pub fn incluir_pedido_db(conn_db: &mut Connection, novo_pedido: &Pedido) -> Result<i64> {
-    let find_id = conn_db.transaction()?;
-    find_id.execute(
+pub fn incluir_pedido_db(novo_pedido: &Pedido) -> Result<i64, AppError> {
+    let conn_db = obter_conexao()?;
+    conn_db.execute(
         "INSERT INTO pedidos (cliente_id, valor_total) VALUES (?1, ?2)",
         (&novo_pedido.cliente_id, &novo_pedido.valor_total),
     )?;
 
-    let id_pedido_encontrado: i64 = find_id.last_insert_rowid();
-    find_id.commit()?;
+    let id_pedido_encontrado: i64 = conn_db.last_insert_rowid();
     Ok(id_pedido_encontrado)
 }
 
-pub fn incluir_item_pedido_db(conn_db: &Connection, novo_item: &ItemPedido, id_pedido: &i64) -> Result<()> {
+pub fn incluir_item_pedido_db(novo_item: &ItemPedido, id_pedido: &i64) -> Result<(), AppError> {
+    let conn_db = obter_conexao()?;
     conn_db.execute(
-        "INSERT INTO itens_pedido (pedido_id, produto_nome, quantidade, valor, subtotal) 
+        "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, valor, subtotal) 
          VALUES (?1, ?2, ?3, ?4, ?5)",
         (
             id_pedido,
-            &novo_item.produto_nome,
+            &novo_item.produto.id_merc,
             &novo_item.quantidade,
             &novo_item.valor,
-            &novo_item.subtotal,
+            novo_item.subtotal(),
         ),
     )?;
     Ok(())
 }
 
-pub fn listar_pedidos_db(conn_db: &Connection) -> Result<Vec<Pedido>> {
+pub fn listar_pedidos_db() -> Result<Vec<Pedido>, AppError> {
+    let conn_db = obter_conexao()?;
     let mut stmt = conn_db.prepare("
         SELECT 
             pedidos.id_pedidos, 
@@ -38,7 +40,7 @@ pub fn listar_pedidos_db(conn_db: &Connection) -> Result<Vec<Pedido>> {
             pedidos.data,
             itens_pedido.id_item, 
             itens_pedido.pedido_id,
-            itens_pedido.produto_nome, 
+            itens_pedido.produto_id,
             itens_pedido.quantidade,
             itens_pedido.valor,
             itens_pedido.subtotal
@@ -54,12 +56,19 @@ pub fn listar_pedidos_db(conn_db: &Connection) -> Result<Vec<Pedido>> {
     while let Some(row) = rows.next()? {
         let id_do_pedido: i64 = row.get(0)?;
 
+        let produto_id: i64 = row.get(6)?;
+
         let item_do_pedido = ItemPedido {
             id_item: row.get(4)?,
-            produto_nome: row.get(6)?,
+            produto: Produto {
+                id_merc: produto_id,
+                nome_merc: String::new(),
+                quantidade_est: 0,
+                quantidade_minima: 0,
+                valor_unitario: row.get(8)?,
+            },
             quantidade: row.get(7)?,
             valor: row.get(8)?,
-            subtotal: row.get(9)?,
         };
 
         let cliente_id_: i64 = row.get(1)?;
@@ -82,7 +91,8 @@ pub fn listar_pedidos_db(conn_db: &Connection) -> Result<Vec<Pedido>> {
     Ok(vec_pedidos_return)
 }
 
-pub fn excluir_pedido_db(conn_db: &Connection, pedido_id: i64) -> Result<()> {
+pub fn excluir_pedido_db(pedido_id: i64) -> Result<(), AppError> {
+    let conn_db = obter_conexao()?;
     conn_db.execute(
         "DELETE FROM itens_pedido WHERE pedido_id = ?1",
         [pedido_id],

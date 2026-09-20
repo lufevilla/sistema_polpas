@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -17,13 +18,16 @@ class StockLowStockCard extends StatelessWidget {
         border: Border.all(color: AppColors.danger.withValues(alpha: 0.25)),
       ),
       child: Column(
+        // Impede que a Column ocupe toda a altura
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // Impede que a Row ocupe toda a largura da tela
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.warning_amber_rounded, color: AppColors.danger),
+              const SizedBox(width: 8), // Adicionado espaçamento entre ícone e contagem
               Text(
                 '$count',
                 style: TextStyle(

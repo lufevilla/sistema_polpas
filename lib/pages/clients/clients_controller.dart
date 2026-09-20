@@ -196,7 +196,6 @@ class ClientesController extends ChangeNotifier {
   Future<void> excluirCliente(ClienteLocal cliente) async {
     try {
       await rust.excluirCliente(
-        cliente: _toRust(cliente),
         clienteId: cliente.id,
       );
       await carregarClientes();
