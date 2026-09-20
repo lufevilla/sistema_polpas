@@ -16,11 +16,8 @@ Future<void> atualizarCliente({
   return atualizarClienteService(cliente: cliente, clienteId: clienteId);
 }
 
-Future<void> excluirCliente({
-  required Cliente cliente,
-  required int clienteId,
-}) {
-  return excluirClienteService(cliente: cliente, clienteId: clienteId);
+Future<void> excluirCliente({required int clienteId}) {
+  return excluirClienteService(clienteId: clienteId);
 }
 
 Future<List<Cliente>> listarClientes() {
