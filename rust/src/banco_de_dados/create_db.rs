@@ -17,13 +17,14 @@ pub fn create_database () -> Result<Connection, AppError> {
             complemento TEXT,
             bairro TEXT NOT NULL,
             municipio TEXT NOT NULL, 
-            uf TEXT NOT NULL
+            uf TEXT NOT NULL,
+            data_registro TEXT DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS pedidos(
             id_pedidos INTEGER PRIMARY KEY AUTOINCREMENT,
             cliente_id INTEGER NOT NULL, 
-            data TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            data TEXT DEFAULT CURRENT_TIMESTAMP,
             valor_total REAL NOT NULL,
             FOREIGN KEY (cliente_id) REFERENCES clientes(id) 
         );
@@ -46,6 +47,19 @@ pub fn create_database () -> Result<Connection, AppError> {
             quantidade_minima INTEGER NOT NULL,
             valor_unitario REAL NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS movimentacao_estoque (
+            id_movimentacao INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_merc INTEGER NOT NULL,
+            tipo_movimentacao TEXT NOT NULL,        
+            quantidade INTEGER NOT NULL,             
+            custo_unitario REAL,              
+            custo_total_compra REAL,                 
+            data_movimentacao TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_merc) REFERENCES estoque (id_merc) ON DELETE RESTRICT
+        ); 
+
+
         
     ").unwrap();
 

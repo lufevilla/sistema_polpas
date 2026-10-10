@@ -152,6 +152,7 @@ fn wire__crate__api__estoque_service__entrada_no_estoque_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_id_merc = <i64>::sse_decode(&mut deserializer);
             let api_quantidade_a_adicionar = <i64>::sse_decode(&mut deserializer);
+            let api_valor_unitario = <f64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, AppError>(
@@ -159,6 +160,7 @@ fn wire__crate__api__estoque_service__entrada_no_estoque_impl(
                         let output_ok = crate::api::estoque_service::entrada_no_estoque(
                             api_id_merc,
                             api_quantidade_a_adicionar,
+                            api_valor_unitario,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)

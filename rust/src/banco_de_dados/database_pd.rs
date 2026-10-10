@@ -3,18 +3,19 @@ use crate::models::pedido::*;
 use crate::banco_de_dados::create_db::obter_conexao;
 use crate::error::AppError;
 
-pub fn incluir_pedido_db(novo_pedido: &Pedido) -> Result<i64, AppError> {
+pub fn incluir_pedido_db(cliente_id: i64, total: f64) -> Result<i64, AppError> {
     let conn_db = obter_conexao()?;
     conn_db.execute(
-        "INSERT INTO pedidos (cliente_id, valor_total) VALUES (?1, ?2)",
-        (&novo_pedido.cliente_id, &novo_pedido.valor_total),
+        "INSERT INTO pedidos (cliente_id,valor_total) VALUES (?1,?2)",
+        (cliente_id,total),
     )?;
 
     let id_pedido_encontrado: i64 = conn_db.last_insert_rowid();
     Ok(id_pedido_encontrado)
 }
 
-pub fn incluir_item_pedido_db(novo_item: &ItemPedido, id_pedido: &i64) -> Result<(), AppError> {
+
+pub fn incluir_item_pedido_db(novo_item: &ItemPedido, id_pedido: i64) -> Result<(), AppError> {
     let conn_db = obter_conexao()?;
     conn_db.execute(
         "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, valor, subtotal) 
