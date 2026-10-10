@@ -19,8 +19,13 @@ pub async fn incluir_item_estoque(produto: Produto) -> Result<(), AppError>{
     
 }
 
-pub async fn entrada_no_estoque (id_merc: i64, quantidade_a_adicionar: i64) -> Result<(), AppError> {
-    entrada_est_db(id_merc, quantidade_a_adicionar);
+pub async fn entrada_no_estoque (id_merc: i64, quantidade_a_adicionar: i64, valor_unitario_compra: f64) -> Result<(), AppError> {
+    let mut movimentacao = Movimentacoes::default();
+    movimentacao.id_merc = id_merc;
+    movimentacao.quantidade = quantidade_a_adicionar;
+    movimentacao.custo_unitario_compra = valor_unitario_compra;
+    movimentacao.tipo_movimentacao = "ENTRADA".to_string();
+    entrada_est_db(movimentacao)?;
     Ok(())
 }
 
@@ -36,7 +41,7 @@ pub async fn saida_estoque(quantidade_saida: i64, id_merc: i64) -> Result<(),App
 }
 
 pub async fn excluir_item(id_merc: i64) -> Result<(), AppError> {
-    excluir_produto_est_db(id_merc);
+    excluir_produto_est_db(id_merc)?;
     Ok(())
 }
 

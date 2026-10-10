@@ -18,15 +18,25 @@ pub fn incluir_merc_est_db(produto: Produto) -> Result<(), AppError>{
     Ok(())
 }
 
-pub fn entrada_est_db(id_merc: i64, quantidade_a_adicionar: i64) -> Result<(),AppError>{
+pub fn entrada_est_db(movimentacao: Movimentacoes) -> Result<(),AppError>{
     let conn_db = obter_conexao()?;
     conn_db.execute( " 
         UPDATE estoque 
         SET quantidade_est = quantidade_est + ?1
         WHERE id_merc = ?2
         ",
-        (quantidade_a_adicionar, id_merc),
+        (movimentacao.quantidade, movimentacao.id_merc),
     )?;
+    conn_db.execute("
+        INSERT INTO movimentacao_estoque (id_merc, tipo_movimentacao, quantidade, custo_unitario_compra, custo_total_compra)
+        VALUES(?1,?2,?3,?4,?5)",
+        (
+            &movimentacao.id_merc, 
+            &movimentacao.tipo_movimentacao, 
+            &movimentacao.quantidade,
+            &movimentacao.custo_unitario_compra,
+            movimentacao.custo_total_compra()) 
+        )?;
 
     Ok(())
 
@@ -76,10 +86,10 @@ pub fn excluir_produto_est_db(id_merc: i64) -> Result<(),AppError>{
     
     let conn_db = obter_conexao()?;
     conn_db.execute("
-    DELETE FROM estoque
-    WHERE id_merc = ?
-    LIMIT 1",
-    params![id_merc]);
+        DELETE FROM estoque
+        WHERE id_merc = ?
+        LIMIT 1",
+    params![id_merc])?;
 
     Ok(())
 }

@@ -29,3 +29,26 @@ pub struct Pedido {
     pub valor_total: f64,
     pub data: String,
 }
+
+#[derive(Default, Clone)]
+pub struct Movimentacoes {
+    pub id_merc: i64, 
+    pub quantidade: i64, 
+    pub custo_unitario_compra: f64,
+    pub tipo_movimentacao: String
+}
+
+impl Movimentacoes {
+    pub fn custo_total_compra(&self) -> f64 {
+        self.quantidade as f64 * self.custo_unitario_compra
+    }      
+}
+
+//    id_movimentacao INTEGER PRIMARY KEY AUTOINCREMENT,
+//             id_merc INTEGER NOT NULL,
+//             tipo_movimentacao TEXT NOT NULL,        
+//             quantidade INTEGER NOT NULL,             
+//             custo_unitario_compra REAL,              
+//             custo_total_compra REAL,                 
+//             data_movimentacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+//             FOREIGN KEY (id_merc) REFERENCES estoque (id_merc) ON DELETE RESTRICT
