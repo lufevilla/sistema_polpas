@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/models/produto_estoque.dart';
 import '../../../core/theme/app_colors.dart';
-import '../models/stock_item.dart';
+import '../../../src/rust/models/pedido.dart';
 
 class StockItemCard extends StatelessWidget {
-  final StockItem item;
-  final VoidCallback onIncrement;
+  final Produto produto;
+  final VoidCallback onEntrada;
   final VoidCallback onDecrement;
-  final VoidCallback onNewBatch;
 
   const StockItemCard({
     super.key,
-    required this.item,
-    required this.onIncrement,
+    required this.produto,
+    required this.onEntrada,
     required this.onDecrement,
-    required this.onNewBatch,
   });
 
   Color get _statusColor {
-    switch (item.status) {
+    switch (produto.status) {
       case StockStatus.high:
       case StockStatus.adequate:
         return AppColors.success;
@@ -32,12 +31,14 @@ class StockItemCard extends StatelessWidget {
     }
   }
 
-  bool get _isCritical =>
-      item.status == StockStatus.low || item.status == StockStatus.critical;
+  bool get _isCritical => produto.isLow;
+
+  String get _precoFormatado =>
+      'R\$ ${produto.valorUnitario.toStringAsFixed(2).replaceAll('.', ',')}';
 
   @override
   Widget build(BuildContext context) {
-    if (item.isOutOfStock) return _buildOutOfStock();
+    if (produto.isOutOfStock) return _buildOutOfStock();
     return _buildInStock();
   }
 
@@ -68,16 +69,16 @@ class StockItemCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.name,
-                      style: TextStyle(
+                      produto.nomeMerc,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textDark,
                       ),
                     ),
                     Text(
-                      item.packageLabel,
-                      style: TextStyle(
+                      _precoFormatado,
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textMuted,
                       ),
@@ -86,7 +87,7 @@ class StockItemCard extends StatelessWidget {
                 ),
               ),
               _StatusBadge(
-                status: item.status,
+                status: produto.status,
                 color: _statusColor,
                 isCritical: _isCritical,
               ),
@@ -96,12 +97,12 @@ class StockItemCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Ocupação',
                 style: TextStyle(fontSize: 11, color: AppColors.textMuted),
               ),
               Text(
-                '${item.quantity} / ${item.capacity} un',
+                '${produto.quantidadeEst.toInt()} / ${produto.quantidadeMinima.toInt()} un',
                 style: TextStyle(
                   fontSize: 11,
                   color: _isCritical ? AppColors.danger : AppColors.textMuted,
@@ -113,7 +114,7 @@ class StockItemCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: LinearProgressIndicator(
-              value: item.occupancyRatio.clamp(0, 1),
+              value: produto.progress,
               minHeight: 8,
               backgroundColor: AppColors.background,
               valueColor: AlwaysStoppedAnimation(_statusColor),
@@ -134,8 +135,8 @@ class StockItemCard extends StatelessWidget {
                     fontFamily: 'monospace',
                   ),
                   children: [
-                    TextSpan(text: '${item.quantity}'),
-                    TextSpan(
+                    TextSpan(text: '${produto.quantidadeEst.toInt()}'),
+                    const TextSpan(
                       text: ' un',
                       style: TextStyle(
                         fontSize: 12,
@@ -158,7 +159,7 @@ class StockItemCard extends StatelessWidget {
                     icon: Icons.add,
                     background: AppColors.headerStart,
                     foreground: Colors.white,
-                    onTap: onIncrement,
+                    onTap: onEntrada,
                   ),
                 ],
               ),
@@ -189,8 +190,8 @@ class StockItemCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.name,
-                      style: TextStyle(
+                      produto.nomeMerc,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textDark,
@@ -198,8 +199,8 @@ class StockItemCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      item.packageLabel,
-                      style: TextStyle(
+                      _precoFormatado,
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textMuted,
                       ),
@@ -216,7 +217,7 @@ class StockItemCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Em Falta',
                     style: TextStyle(
                       fontSize: 10,
@@ -231,20 +232,23 @@ class StockItemCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'Ocupação',
                   style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                 ),
                 Text(
-                  '0 / ${item.capacity} un',
-                  style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                  '0 / ${produto.quantidadeMinima.toInt()} un',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 6),
             ClipRRect(
               borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
+              child: const LinearProgressIndicator(
                 value: 0,
                 minHeight: 8,
                 backgroundColor: AppColors.background,
@@ -257,12 +261,12 @@ class StockItemCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   '0 un',
                   style: TextStyle(fontSize: 16, color: AppColors.textMuted),
                 ),
                 OutlinedButton(
-                  onPressed: onNewBatch,
+                  onPressed: onEntrada,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.headerStart,
                     side: BorderSide(

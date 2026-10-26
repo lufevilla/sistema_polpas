@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import 'stock_controller.dart';
 import 'widgets/stock_bestseller_card.dart';
+import 'widgets/stock_form_modal.dart';
 import 'widgets/stock_item_card.dart';
 import 'widgets/stock_low_stock_card.dart';
-import 'widgets/stock_form_modal.dart';
+import 'widgets/stock_movimento_modal.dart';
 
 class StockPage extends StatefulWidget {
   const StockPage({super.key});
@@ -35,12 +36,21 @@ class _StockPageState extends State<StockPage> {
   void _abrirModalNovoItem() {
     mostrarModalNovoItemEstoque(
       context: context,
-      aoSalvar: (item) {
-        _controller.incluirItem(
-          nome: item.name,
-          quantidade: item.quantity,
-          quantidadeMinima: item.capacity,
-          valorUnitario: 0,
+      aoSalvar: (produto) {
+        _controller.incluirItem(produto);
+      },
+    );
+  }
+
+  void _abrirModalEntrada(Produto produto) {
+    mostrarModalEntradaEstoque(
+      context: context,
+      produto: produto,
+      aoSalvar: (quantidade, valorUnitario) {
+        _controller.registrarEntrada(
+          produto: produto,
+          quantidade: quantidade,
+          valorUnitario: valorUnitario,
         );
       },
     );
@@ -69,7 +79,10 @@ class _StockPageState extends State<StockPage> {
                 Text(
                   _controller.erro,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: AppColors.textDark),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textDark,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
@@ -114,14 +127,13 @@ class _StockPageState extends State<StockPage> {
               padding: const EdgeInsets.all(20),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final item = _controller.items[index];
+                  final produto = _controller.items[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: StockItemCard(
-                      item: item,
-                      onIncrement: () => _controller.increment(item.id),
-                      onDecrement: () => _controller.decrement(item.id),
-                      onNewBatch: () => _controller.startNewBatch(item.id),
+                      produto: produto,
+                      onEntrada: () => _abrirModalEntrada(produto),
+                      onDecrement: () => _controller.decrement(produto),
                     ),
                   );
                 }, childCount: _controller.items.length),

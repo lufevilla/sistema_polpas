@@ -1,35 +1,32 @@
 import 'package:flutter/foundation.dart';
+import '../../core/models/produto_estoque.dart';
+import '../../src/rust/api/estoque_service.dart' as svc;
+import '../../src/rust/models/pedido.dart';
 
-import 'package:sistema_polpas/rust/estoque.dart' as rust;
-import 'models/stock_item.dart';
+export '../../src/rust/models/pedido.dart' show Produto;
 
 class StockController extends ChangeNotifier {
-  final List<StockItem> _items = [];
+  final List<Produto> _items = [];
   bool _carregando = false;
   String _erro = '';
 
-  List<StockItem> get items => List.unmodifiable(_items);
+  List<Produto> get items => List.unmodifiable(_items);
   bool get carregando => _carregando;
   String get erro => _erro;
-  int get totalStock => _items.fold(0, (sum, item) => sum + item.quantity);
-  int get lowStockCount => _items
-      .where(
-        (item) =>
-            item.status == StockStatus.low ||
-            item.status == StockStatus.critical,
-      )
-      .length;
-  String get bestSellerName => _items.isNotEmpty ? _items.first.name : '—';
+  int get totalStock =>
+      _items.fold(0, (sum, item) => sum + item.quantidadeEst.toInt());
+  int get lowStockCount => _items.where((item) => item.isLow).length;
+  String get bestSellerName => _items.isNotEmpty ? _items.first.nomeMerc : '—';
 
   Future<void> carregarEstoque() async {
     _carregando = true;
     _erro = '';
     notifyListeners();
     try {
-      final produtos = await rust.carregarEstoque();
+      final produtos = await svc.listagemDoEstoque();
       _items
         ..clear()
-        ..addAll(produtos.map(StockItem.fromProduto));
+        ..addAll(produtos);
     } catch (e) {
       _erro = e.toString();
     } finally {
@@ -38,21 +35,26 @@ class StockController extends ChangeNotifier {
     }
   }
 
-  Future<void> incluirItem({
-    required String nome,
+  Future<void> incluirItem(Produto produto) async {
+    try {
+      await svc.incluirItemEstoque(produto: produto);
+      await carregarEstoque();
+    } catch (e) {
+      _erro = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> registrarEntrada({
+    required Produto produto,
     required int quantidade,
-    required int quantidadeMinima,
     required double valorUnitario,
   }) async {
     try {
-      await rust.incluirItemEstoque(
-        produto: rust.Produto(
-          idMerc: 0,
-          nomeMerc: nome,
-          quantidadeEst: quantidade,
-          quantidadeMinima: quantidadeMinima,
-          valorUnitario: valorUnitario,
-        ),
+      await svc.entradaNoEstoque(
+        idMerc: produto.idMerc,
+        quantidadeAAdicionar: quantidade,
+        valorUnitarioCompra: valorUnitario,
       );
       await carregarEstoque();
     } catch (e) {
@@ -61,27 +63,10 @@ class StockController extends ChangeNotifier {
     }
   }
 
-  Future<void> increment(String id) async {
-    final index = _items.indexWhere((item) => item.id == id);
-    if (index == -1) return;
+  Future<void> decrement(Produto produto) async {
     try {
-      await rust.entradaEstoque(
-        idMerc: int.parse(id),
-        quantidadeAAdicionar: 1,
-      );
-      await carregarEstoque();
-    } catch (e) {
-      _erro = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> decrement(String id) async {
-    final index = _items.indexWhere((item) => item.id == id);
-    if (index == -1) return;
-    try {
-      await rust.saidaEstoque(
-        idMerc: int.parse(id),
+      await svc.saidaEstoque(
+        idMerc: produto.idMerc,
         quantidadeSaida: 1,
       );
       await carregarEstoque();
@@ -91,27 +76,9 @@ class StockController extends ChangeNotifier {
     }
   }
 
-  Future<void> excluirItem(String id) async {
+  Future<void> excluirItem(Produto produto) async {
     try {
-      await rust.excluirItemEstoque(idMerc: int.parse(id));
-      await carregarEstoque();
-    } catch (e) {
-      _erro = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> startNewBatch(String id) async {
-    final index = _items.indexWhere((item) => item.id == id);
-    if (index == -1) return;
-    try {
-      final item = _items[index];
-      final toAdd = item.capacity - item.quantity;
-      if (toAdd <= 0) return;
-      await rust.entradaEstoque(
-        idMerc: int.parse(id),
-        quantidadeAAdicionar: toAdd,
-      );
+      await svc.excluirItem(idMerc: produto.idMerc);
       await carregarEstoque();
     } catch (e) {
       _erro = e.toString();
