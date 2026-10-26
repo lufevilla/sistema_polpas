@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/models/produto_estoque.dart';
 import '../../../core/theme/app_colors.dart';
-import '../home_controller.dart';
+import '../../../src/rust/models/pedido.dart';
 
 // O cabeçalho (antigo HomeHeader) virou um componente fixo do app inteiro
 // e foi movido para lib/features/appHeader/app_header.dart
@@ -188,7 +189,7 @@ class NotasFiscaisTile extends StatelessWidget {
 /// Seção "Destaques do Estoque": título + ícone + lista de itens + link
 /// "Ver stock completo" no rodapé da seção.
 class StockHighlightSection extends StatelessWidget {
-  final List<StockItem> items;
+  final List<Produto> items;
   final VoidCallback onVerEstoqueCompleto;
 
   const StockHighlightSection({
@@ -228,10 +229,19 @@ class StockHighlightSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          for (final item in items) ...[
-            StockItemTile(item: item),
-            const SizedBox(height: 14),
-          ],
+          if (items.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'Nenhum item no estoque.',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+              ),
+            )
+          else
+            for (final item in items) ...[
+              StockItemTile(produto: item),
+              const SizedBox(height: 14),
+            ],
           const Divider(height: 24, color: AppColors.border),
           Center(
             child: TextButton(
@@ -265,12 +275,24 @@ class StockHighlightSection extends StatelessWidget {
 /// Linha de um item de stock: imagem (placeholder), nome, barra de
 /// progresso e quantidade/etiqueta de "Baixo!".
 class StockItemTile extends StatelessWidget {
-  final StockItem item;
+  final Produto produto;
 
-  const StockItemTile({super.key, required this.item});
+  const StockItemTile({super.key, required this.produto});
+
+  static const _placeholderColors = [
+    Color(0xFFE8A33D),
+    Color(0xFF8B1E1E),
+    Color(0xFF4C7A34),
+    Color(0xFF6B4C9A),
+  ];
+
+  Color get _placeholderColor =>
+      _placeholderColors[produto.nomeMerc.hashCode.abs() %
+          _placeholderColors.length];
 
   @override
   Widget build(BuildContext context) {
+    final isLow = produto.isLow;
     return Row(
       children: [
         // TODO: substituir por Image.asset/Image.network real do produto.
@@ -278,7 +300,7 @@ class StockItemTile extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: item.placeholderColor,
+            color: _placeholderColor,
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -288,7 +310,7 @@ class StockItemTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                item.name,
+                produto.nomeMerc,
                 style: const TextStyle(
                   color: AppColors.textDark,
                   fontWeight: FontWeight.w700,
@@ -299,11 +321,11 @@ class StockItemTile extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: item.progress,
+                  value: produto.progress,
                   minHeight: 6,
                   backgroundColor: const Color(0xFFEFE6D8),
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    item.isLow ? AppColors.danger : AppColors.gold,
+                    isLow ? AppColors.danger : AppColors.gold,
                   ),
                 ),
               ),
@@ -312,10 +334,10 @@ class StockItemTile extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          item.quantityLabel,
+          produto.quantityLabel,
           style: TextStyle(
-            color: item.isLow ? AppColors.danger : AppColors.textMuted,
-            fontWeight: item.isLow ? FontWeight.w700 : FontWeight.w500,
+            color: isLow ? AppColors.danger : AppColors.textMuted,
+            fontWeight: isLow ? FontWeight.w700 : FontWeight.w500,
             fontSize: 13,
           ),
         ),

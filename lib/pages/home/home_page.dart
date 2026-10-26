@@ -24,6 +24,22 @@ class _HomePageState extends State<HomePage> {
   final HomeController _controller = HomeController();
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_aoControladorMudar);
+    _controller.carregarEstoque();
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_aoControladorMudar);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _aoControladorMudar() => setState(() {});
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.background,
@@ -36,7 +52,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                NovoPedidoCard(onTap: _controller.onNovoPedidoTap),
+                NovoPedidoCard(onTap:() => _controller.onNovoPedidoTap(context)),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -57,13 +73,29 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                NotasFiscaisTile(onTap: _controller.onNotasFiscaisTap),
+                //const SizedBox(height: 16),
+                //NotasFiscaisTile(onTap: _controller.onNotasFiscaisTap),
                 const SizedBox(height: 20),
-                StockHighlightSection(
-                  items: _controller.highlightedStock,
-                  onVerEstoqueCompleto: _controller.onVerEstoqueCompletoTap,
-                ),
+                if (_controller.carregando)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (_controller.erro.isNotEmpty)
+                  Text(
+                    _controller.erro,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.danger,
+                      fontSize: 13,
+                    ),
+                  )
+                else
+                  StockHighlightSection(
+                    items: _controller.highlightedStock,
+                    onVerEstoqueCompleto: () =>
+                        _controller.onVerEstoqueCompletoTap(context),
+                  ),
               ],
             ),
           ),
