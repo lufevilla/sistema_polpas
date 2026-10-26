@@ -1,30 +1,81 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sistema_polpas/pages/stock/widgets/stock_item_card.dart';
+import 'package:sistema_polpas/src/rust/models/pedido.dart';
 
-import 'package:sistema_polpas/main.dart';
+const produtoEmEstoque = Produto(
+  idMerc: 7,
+  nomeMerc: 'Acerola',
+  quantidadeEst: 3,
+  quantidadeMinima: 10,
+  valorUnitario: 8.5,
+);
+
+const produtoEmFalta = Produto(
+  idMerc: 8,
+  nomeMerc: 'Maracujá',
+  quantidadeEst: 0,
+  quantidadeMinima: 10,
+  valorUnitario: 12,
+);
+
+Widget app({
+  required Produto produto,
+  VoidCallback? onEntrada,
+  VoidCallback? onDecrement,
+}) {
+  return MaterialApp(
+    home: Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: StockItemCard(
+          produto: produto,
+          onEntrada: onEntrada ?? () {},
+          onDecrement: onDecrement ?? () {},
+        ),
+      ),
+    ),
+  );
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('mostra produto em estoque e dispara ações', (tester) async {
+    var entradas = 0;
+    var saidas = 0;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      app(
+        produto: produtoEmEstoque,
+        onEntrada: () => entradas++,
+        onDecrement: () => saidas++,
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
+    expect(find.text('Acerola'), findsOneWidget);
+    expect(find.text('R\$ 8,50'), findsOneWidget);
+    expect(find.text('3 / 10 un'), findsOneWidget);
+
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.tap(find.byIcon(Icons.remove));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(entradas, 1);
+    expect(saidas, 1);
+  });
+
+  testWidgets('mostra Novo Lote quando o produto está em falta', (
+    tester,
+  ) async {
+    var entradas = 0;
+
+    await tester.pumpWidget(
+      app(produto: produtoEmFalta, onEntrada: () => entradas++),
+    );
+
+    expect(find.text('Em Falta'), findsOneWidget);
+    expect(find.text('Novo Lote'), findsOneWidget);
+
+    await tester.tap(find.text('Novo Lote'));
+
+    expect(entradas, 1);
   });
 }
