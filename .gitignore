@@ -12,3 +12,14 @@ web/
 
 integration_test/
 build/
+docs/
+target/
+rust_builder/
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# IDE
+.vscode/
