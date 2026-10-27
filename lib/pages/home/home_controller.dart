@@ -3,6 +3,7 @@ import 'package:sistema_polpas/pages/clients/clients_page.dart';
 import 'package:sistema_polpas/pages/sales/sales_page.dart';
 import 'package:sistema_polpas/pages/stock/stock_page.dart';
 import '../../core/models/produto_estoque.dart';
+import '../../core/utils/rust_error.dart';
 import '../../src/rust/api/estoque_service.dart' as svc;
 import '../../src/rust/models/pedido.dart';
 
@@ -44,7 +45,7 @@ class HomeController extends ChangeNotifier {
         ..clear()
         ..addAll(ordenados.take(2));
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
     } finally {
       _carregando = false;
       notifyListeners();

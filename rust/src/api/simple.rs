@@ -1,3 +1,4 @@
+use crate::banco_de_dados::create_db::create_database;
 use crate::error::AppError;
 
 #[flutter_rust_bridge::frb(sync)] // Synchronous mode for simplicity of the demo
@@ -9,6 +10,9 @@ pub fn greet(name: String) -> String {
 pub fn init_app() {
     // Default utilities - feel free to customize
     flutter_rust_bridge::setup_default_user_utils();
+    if let Err(erro) = create_database() {
+        eprintln!("Falha ao preparar o banco de dados: {erro}");
+    }
 }
 
 #[flutter_rust_bridge::frb(sync)]

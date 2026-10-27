@@ -1,10 +1,9 @@
-use rusqlite::{Connection, Result};
+use rusqlite::Connection;
 
 use crate::error::AppError;
 
-pub fn create_database () -> Result<Connection, AppError> {
-
-    let conn_db = Connection::open("banco_de_dados.db").unwrap();
+pub fn create_database() -> Result<Connection, AppError> {
+    let conn_db = Connection::open("banco_de_dados.db")?;
     conn_db.execute_batch("
         CREATE TABLE IF NOT EXISTS clientes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +52,7 @@ pub fn create_database () -> Result<Connection, AppError> {
             id_merc INTEGER NOT NULL,
             tipo_movimentacao TEXT NOT NULL,        
             quantidade INTEGER NOT NULL,             
-            custo_unitario REAL,              
+            custo_unitario_compra REAL,
             custo_total_compra REAL,                 
             data_movimentacao TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (id_merc) REFERENCES estoque (id_merc) ON DELETE RESTRICT
@@ -61,7 +60,26 @@ pub fn create_database () -> Result<Connection, AppError> {
 
 
         
-    ").unwrap();
+    ")?;
+
+    let tem_coluna_nova: bool = conn_db.query_row(
+        "SELECT COUNT(*) > 0 FROM pragma_table_info('movimentacao_estoque') WHERE name = 'custo_unitario_compra'",
+        [],
+        |row| row.get(0),
+    )?;
+    if !tem_coluna_nova {
+        let tem_coluna_antiga: bool = conn_db.query_row(
+            "SELECT COUNT(*) > 0 FROM pragma_table_info('movimentacao_estoque') WHERE name = 'custo_unitario'",
+            [],
+            |row| row.get(0),
+        )?;
+        if tem_coluna_antiga {
+            conn_db.execute(
+                "ALTER TABLE movimentacao_estoque RENAME COLUMN custo_unitario TO custo_unitario_compra",
+                [],
+            )?;
+        }
+    }
 
     Ok(conn_db)
 }

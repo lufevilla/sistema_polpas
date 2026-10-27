@@ -6,6 +6,7 @@
 import 'api/clientes_service.dart';
 import 'api/estoque_service.dart';
 import 'api/pedidos_service.dart';
+import 'api/relatorios_service.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -72,7 +73,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -2050640170;
+  int get rustContentHash => 837409635;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -89,7 +90,7 @@ abstract class RustLibApi extends BaseApi {
     required PlatformInt64 clienteId,
   });
 
-  Future<PlatformInt64> crateApiPedidosServiceCriarPedido({
+  Future<void> crateApiPedidosServiceCriarPedido({
     required PlatformInt64 clienteId,
     required List<ItemPedido> itens,
   });
@@ -97,6 +98,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiEstoqueServiceEntradaNoEstoque({
     required PlatformInt64 idMerc,
     required PlatformInt64 quantidadeAAdicionar,
+    required double valorUnitarioCompra,
   });
 
   Future<void> crateApiClientesServiceExcluirClienteService({
@@ -131,10 +133,17 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<Pedido>> crateApiPedidosServiceListarPedidos();
 
+  Future<(Int64List, PlatformInt64)>
+  crateApiRelatoriosServiceMovRegistrosClientes();
+
+  Future<(double, double)> crateApiRelatoriosServiceMovimentacaoMensal();
+
   Future<void> crateApiEstoqueServiceSaidaEstoque({
     required PlatformInt64 quantidadeSaida,
     required PlatformInt64 idMerc,
   });
+
+  Future<List<(String, PlatformInt64)>> crateApiRelatoriosServiceSaidaMensal();
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_AppError;
@@ -190,7 +199,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<PlatformInt64> crateApiPedidosServiceCriarPedido({
+  Future<void> crateApiPedidosServiceCriarPedido({
     required PlatformInt64 clienteId,
     required List<ItemPedido> itens,
   }) {
@@ -208,7 +217,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_i_64,
+          decodeSuccessData: sse_decode_unit,
           decodeErrorData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
@@ -229,6 +238,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiEstoqueServiceEntradaNoEstoque({
     required PlatformInt64 idMerc,
     required PlatformInt64 quantidadeAAdicionar,
+    required double valorUnitarioCompra,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -236,6 +246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_64(idMerc, serializer);
           sse_encode_i_64(quantidadeAAdicionar, serializer);
+          sse_encode_f_64(valorUnitarioCompra, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -249,7 +260,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
         ),
         constMeta: kCrateApiEstoqueServiceEntradaNoEstoqueConstMeta,
-        argValues: [idMerc, quantidadeAAdicionar],
+        argValues: [idMerc, quantidadeAAdicionar, valorUnitarioCompra],
         apiImpl: this,
       ),
     );
@@ -258,7 +269,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiEstoqueServiceEntradaNoEstoqueConstMeta =>
       const TaskConstMeta(
         debugName: "entrada_no_estoque",
-        argNames: ["idMerc", "quantidadeAAdicionar"],
+        argNames: ["idMerc", "quantidadeAAdicionar", "valorUnitarioCompra"],
       );
 
   @override
@@ -589,6 +600,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "listar_pedidos", argNames: []);
 
   @override
+  Future<(Int64List, PlatformInt64)>
+  crateApiRelatoriosServiceMovRegistrosClientes() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_record_list_prim_i_64_strict_i_64,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiRelatoriosServiceMovRegistrosClientesConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRelatoriosServiceMovRegistrosClientesConstMeta =>
+      const TaskConstMeta(debugName: "mov_registros_clientes", argNames: []);
+
+  @override
+  Future<(double, double)> crateApiRelatoriosServiceMovimentacaoMensal() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_record_f_64_f_64,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiRelatoriosServiceMovimentacaoMensalConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRelatoriosServiceMovimentacaoMensalConstMeta =>
+      const TaskConstMeta(debugName: "movimentacao_mensal", argNames: []);
+
+  @override
   Future<void> crateApiEstoqueServiceSaidaEstoque({
     required PlatformInt64 quantidadeSaida,
     required PlatformInt64 idMerc,
@@ -602,7 +670,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 17,
             port: port_,
           );
         },
@@ -623,6 +691,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "saida_estoque",
         argNames: ["quantidadeSaida", "idMerc"],
       );
+
+  @override
+  Future<List<(String, PlatformInt64)>> crateApiRelatoriosServiceSaidaMensal() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 18,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_record_string_i_64,
+          decodeErrorData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAppError,
+        ),
+        constMeta: kCrateApiRelatoriosServiceSaidaMensalConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiRelatoriosServiceSaidaMensalConstMeta =>
+      const TaskConstMeta(debugName: "saida_mensal", argNames: []);
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_AppError => wire
@@ -745,6 +841,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Int64List dco_decode_list_prim_i_64_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeInt64List(raw);
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -754,6 +856,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<Produto> dco_decode_list_produto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_produto).toList();
+  }
+
+  @protected
+  List<(String, PlatformInt64)> dco_decode_list_record_string_i_64(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_i_64).toList();
   }
 
   @protected
@@ -790,6 +900,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       quantidadeMinima: dco_decode_i_64(arr[3]),
       valorUnitario: dco_decode_f_64(arr[4]),
     );
+  }
+
+  @protected
+  (double, double) dco_decode_record_f_64_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_f_64(arr[0]), dco_decode_f_64(arr[1]));
+  }
+
+  @protected
+  (Int64List, PlatformInt64) dco_decode_record_list_prim_i_64_strict_i_64(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_list_prim_i_64_strict(arr[0]), dco_decode_i_64(arr[1]));
+  }
+
+  @protected
+  (String, PlatformInt64) dco_decode_record_string_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_i_64(arr[1]));
   }
 
   @protected
@@ -955,6 +1097,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getInt64List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -969,6 +1118,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Produto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_produto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(String, PlatformInt64)> sse_decode_list_record_string_i_64(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, PlatformInt64)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_i_64(deserializer));
     }
     return ans_;
   }
@@ -1016,6 +1179,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       quantidadeMinima: var_quantidadeMinima,
       valorUnitario: var_valorUnitario,
     );
+  }
+
+  @protected
+  (double, double) sse_decode_record_f_64_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_f_64(deserializer);
+    var var_field1 = sse_decode_f_64(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (Int64List, PlatformInt64) sse_decode_record_list_prim_i_64_strict_i_64(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_prim_i_64_strict(deserializer);
+    var var_field1 = sse_decode_i_64(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (String, PlatformInt64) sse_decode_record_string_i_64(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_i_64(deserializer);
+    return (var_field0, var_field1);
   }
 
   @protected
@@ -1165,6 +1356,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_prim_i_64_strict(
+    Int64List self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putInt64List(self);
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -1180,6 +1381,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_produto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_string_i_64(
+    List<(String, PlatformInt64)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_i_64(item, serializer);
     }
   }
 
@@ -1211,6 +1424,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.quantidadeEst, serializer);
     sse_encode_i_64(self.quantidadeMinima, serializer);
     sse_encode_f_64(self.valorUnitario, serializer);
+  }
+
+  @protected
+  void sse_encode_record_f_64_f_64(
+    (double, double) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.$1, serializer);
+    sse_encode_f_64(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_list_prim_i_64_strict_i_64(
+    (Int64List, PlatformInt64) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_i_64_strict(self.$1, serializer);
+    sse_encode_i_64(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_i_64(
+    (String, PlatformInt64) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_i_64(self.$2, serializer);
   }
 
   @protected

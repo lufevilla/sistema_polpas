@@ -18,28 +18,38 @@ pub fn incluir_merc_est_db(produto: Produto) -> Result<(), AppError>{
     Ok(())
 }
 
-pub fn entrada_est_db(movimentacao: Movimentacoes) -> Result<(),AppError>{
-    let conn_db = obter_conexao()?;
-    conn_db.execute( " 
-        UPDATE estoque 
+pub fn entrada_est_db(movimentacao: Movimentacoes) -> Result<(), AppError> {
+    let mut conn_db = obter_conexao()?;
+    let tx = conn_db.transaction()?;
+
+    let linhas_atualizadas = tx.execute(
+        "
+        UPDATE estoque
         SET quantidade_est = quantidade_est + ?1
         WHERE id_merc = ?2
         ",
         (movimentacao.quantidade, movimentacao.id_merc),
     )?;
-    conn_db.execute("
+
+    if linhas_atualizadas == 0 {
+        return Err(AppError::ProdutoNaoEncontrado);
+    }
+
+    tx.execute(
+        "
         INSERT INTO movimentacao_estoque (id_merc, tipo_movimentacao, quantidade, custo_unitario_compra, custo_total_compra)
         VALUES(?1,?2,?3,?4,?5)",
         (
-            &movimentacao.id_merc, 
-            &movimentacao.tipo_movimentacao, 
+            &movimentacao.id_merc,
+            &movimentacao.tipo_movimentacao,
             &movimentacao.quantidade,
             &movimentacao.custo_unitario_compra,
-            movimentacao.custo_total_compra()) 
-        )?;
+            movimentacao.custo_total_compra(),
+        ),
+    )?;
 
+    tx.commit()?;
     Ok(())
-
 }
 
 pub fn saida_est_db(quantidade_saida: i64, id_merc: i64) -> Result<(), AppError>{

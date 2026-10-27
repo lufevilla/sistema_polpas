@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../core/models/produto_estoque.dart';
+import '../../core/utils/rust_error.dart';
 import '../../src/rust/api/estoque_service.dart' as svc;
 import '../../src/rust/models/pedido.dart';
 
@@ -28,7 +29,7 @@ class StockController extends ChangeNotifier {
         ..clear()
         ..addAll(produtos);
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
     } finally {
       _carregando = false;
       notifyListeners();
@@ -40,7 +41,7 @@ class StockController extends ChangeNotifier {
       await svc.incluirItemEstoque(produto: produto);
       await carregarEstoque();
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
       notifyListeners();
     }
   }
@@ -58,7 +59,7 @@ class StockController extends ChangeNotifier {
       );
       await carregarEstoque();
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
       notifyListeners();
     }
   }
@@ -71,7 +72,7 @@ class StockController extends ChangeNotifier {
       );
       await carregarEstoque();
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
       notifyListeners();
     }
   }
@@ -81,7 +82,7 @@ class StockController extends ChangeNotifier {
       await svc.excluirItem(idMerc: produto.idMerc);
       await carregarEstoque();
     } catch (e) {
-      _erro = e.toString();
+      _erro = extrairMensagemErro(e);
       notifyListeners();
     }
   }

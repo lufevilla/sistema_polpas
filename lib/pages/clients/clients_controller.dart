@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sistema_polpas/rust/clientes.dart' as rust;
+import 'package:sistema_polpas/src/rust/error.dart';
+import '../../src/rust/api/clientes_service.dart';
+import '../../src/rust/models/cliente.dart';
+import '../../src/rust/api/simple.dart' as api;
 
 enum ClienteStatus { ativo, pendente }
 
@@ -86,7 +89,7 @@ class ClienteLocal {
   }
 }
 
-ClienteLocal _fromRust(rust.Cliente c) {
+ClienteLocal _fromRust(c) {
   return ClienteLocal(
     id: c.id.toInt(),
     nome: c.nome,
@@ -104,13 +107,13 @@ ClienteLocal _fromRust(rust.Cliente c) {
   );
 }
 
-rust.Cliente _toRust(ClienteLocal c) {
-  return rust.Cliente(
+Cliente _toRust(ClienteLocal c) {
+  return Cliente(
     id: c.id,
     nome: c.nome,
     cadastro: c.cadastro,
     telefone: c.telefone,
-    endereco: rust.Endereco(
+    endereco: Endereco(
       cep: c.endereco.cep,
       logradouro: c.endereco.logradouro,
       numero: c.endereco.numero,
@@ -156,7 +159,7 @@ class ClientesController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final clientesRust = await rust.listarClientes();
+      final clientesRust = await listarClientesService();
       _clientes = clientesRust.map(_fromRust).toList();
     } catch (e) {
       _erro = _extrairMensagemErro(e);
@@ -166,13 +169,9 @@ class ClientesController extends ChangeNotifier {
     }
   }
 
-  // Método auxiliar para formatar os erros vindos do Rust
-  String _extrairMensagemErro(Object e) {
-    return rust.extrairMensagemErro(e);
-  }
   Future<void> adicionarCliente(ClienteLocal cliente) async {
     try {
-      await rust.incluirCliente(cliente: _toRust(cliente));
+      await incluirClienteService(cliente: _toRust(cliente));
       await carregarClientes();
     } catch (e) {
       _erro = _extrairMensagemErro(e);
@@ -182,7 +181,7 @@ class ClientesController extends ChangeNotifier {
 
   Future<void> atualizarCliente(ClienteLocal cliente) async {
     try {
-      await rust.atualizarCliente(
+      await atualizarClienteService(
         cliente: _toRust(cliente),
         clienteId: cliente.id,
       );
@@ -195,7 +194,7 @@ class ClientesController extends ChangeNotifier {
 
   Future<void> excluirCliente(ClienteLocal cliente) async {
     try {
-      await rust.excluirCliente(
+      await excluirClienteService(
         clienteId: cliente.id,
       );
       await carregarClientes();
@@ -203,5 +202,13 @@ class ClientesController extends ChangeNotifier {
       _erro = _extrairMensagemErro(e);
       notifyListeners();
     }
+  }
+
+  // Método auxiliar para formatar os erros vindos do Rust
+  String _extrairMensagemErro(Object e) {
+    if (e is AppError) {
+      return api.extrairMensagemErro(erro: e);
+    }
+    return e.toString();
   }
 }

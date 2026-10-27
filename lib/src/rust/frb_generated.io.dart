@@ -6,6 +6,7 @@
 import 'api/clientes_service.dart';
 import 'api/estoque_service.dart';
 import 'api/pedidos_service.dart';
+import 'api/relatorios_service.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -74,10 +75,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Pedido> dco_decode_list_pedido(dynamic raw);
 
   @protected
+  Int64List dco_decode_list_prim_i_64_strict(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<Produto> dco_decode_list_produto(dynamic raw);
+
+  @protected
+  List<(String, PlatformInt64)> dco_decode_list_record_string_i_64(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -87,6 +94,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Produto dco_decode_produto(dynamic raw);
+
+  @protected
+  (double, double) dco_decode_record_f_64_f_64(dynamic raw);
+
+  @protected
+  (Int64List, PlatformInt64) dco_decode_record_list_prim_i_64_strict_i_64(
+    dynamic raw,
+  );
+
+  @protected
+  (String, PlatformInt64) dco_decode_record_string_i_64(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -143,10 +161,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Pedido> sse_decode_list_pedido(SseDeserializer deserializer);
 
   @protected
+  Int64List sse_decode_list_prim_i_64_strict(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   List<Produto> sse_decode_list_produto(SseDeserializer deserializer);
+
+  @protected
+  List<(String, PlatformInt64)> sse_decode_list_record_string_i_64(
+    SseDeserializer deserializer,
+  );
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
@@ -156,6 +182,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Produto sse_decode_produto(SseDeserializer deserializer);
+
+  @protected
+  (double, double) sse_decode_record_f_64_f_64(SseDeserializer deserializer);
+
+  @protected
+  (Int64List, PlatformInt64) sse_decode_record_list_prim_i_64_strict_i_64(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, PlatformInt64) sse_decode_record_string_i_64(
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -223,6 +262,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_pedido(List<Pedido> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_prim_i_64_strict(
+    Int64List self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -232,6 +277,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_produto(List<Produto> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_string_i_64(
+    List<(String, PlatformInt64)> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
@@ -239,6 +290,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_produto(Produto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_f_64_f_64(
+    (double, double) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_list_prim_i_64_strict_i_64(
+    (Int64List, PlatformInt64) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_i_64(
+    (String, PlatformInt64) self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

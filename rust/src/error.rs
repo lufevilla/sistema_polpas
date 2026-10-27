@@ -20,6 +20,9 @@ pub enum AppError {
 
     #[error("O item já está cadastrado no estoque")]
     MercadoriaJaExiste,
+
+    #[error("Produto não encontrado no estoque.")]
+    ProdutoNaoEncontrado,
 }
 
 #[flutter_rust_bridge::frb]

@@ -18,9 +18,11 @@ Future<void> incluirItemEstoque({required Produto produto}) => RustLib
 Future<void> entradaNoEstoque({
   required PlatformInt64 idMerc,
   required PlatformInt64 quantidadeAAdicionar,
+  required double valorUnitarioCompra,
 }) => RustLib.instance.api.crateApiEstoqueServiceEntradaNoEstoque(
   idMerc: idMerc,
   quantidadeAAdicionar: quantidadeAAdicionar,
+  valorUnitarioCompra: valorUnitarioCompra,
 );
 
 Future<List<Produto>> listagemDoEstoque() =>

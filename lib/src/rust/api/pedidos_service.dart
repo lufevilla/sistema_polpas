@@ -8,7 +8,7 @@ import '../frb_generated.dart';
 import '../models/pedido.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<PlatformInt64> criarPedido({
+Future<void> criarPedido({
   required PlatformInt64 clienteId,
   required List<ItemPedido> itens,
 }) => RustLib.instance.api.crateApiPedidosServiceCriarPedido(
